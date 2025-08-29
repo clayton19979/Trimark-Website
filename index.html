@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trimark Industries - EVE Frontier</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js" type="application/javascript" onerror="loadEthersFallback()"></script>
+    <script>
+        function loadEthersFallback() {
+            console.log('Primary ethers CDN failed, trying fallback...');
+            const script = document.createElement('script');
+            script.src = 'https://unpkg.com/ethers@5.7.2/dist/ethers.umd.min.js';
+            script.onload = () => console.log('Fallback ethers loaded successfully');
+            script.onerror = () => console.error('All ethers CDNs failed');
+            document.head.appendChild(script);
+        }
+    </script>
+    <script src="https://unpkg.com/@metamask/detect-provider@2.0.0/dist/detect-provider.min.js"></script>
+</head>
+<body>
+    <div class="stars"></div>
+    <div class="twinkling"></div>
+    
+    <div class="container">
+        <header class="header">
+            <div class="logo">
+                <div class="logo-image">
+                    <img src="ChatGPT_Image_Jul_3_2025_08_34_57_PM.png" alt="Trimark Industries Logo" class="corp-logo">
+                </div>
+                <div class="logo-text">
+                    <h1>TRIMARK INDUSTRIES</h1>
+                    <p class="tagline">Forging the Future in EVE Frontier</p>
+                </div>
+            </div>
+            
+            <nav class="nav">
+                <a href="#home" class="nav-link active">Home</a>
+                <a href="#about" class="nav-link">About</a>
+                <a href="#services" class="nav-link">Services</a>
+                <a href="#contact" class="nav-link">Contact</a>
+            </nav>
+
+            <div class="wallet-section">
+                <button id="connectWallet" class="wallet-btn">
+                    <span class="wallet-icon">🔗</span>
+                    Connect Wallet
+                </button>
+                <button id="adminPanelBtn" class="wallet-btn" style="background: #9b59b6; margin-left: 10px; display: none;">
+                    Admin Panel
+                </button>
+
+                <div id="userProfile" class="user-profile hidden">
+                    <img id="userPortrait" src="" alt="Character Portrait" class="user-portrait">
+                    <div class="user-info">
+                        <span id="userName" class="user-name"></span>
+                        <span id="userAddress" class="user-address"></span>
+                    </div>
+                    <button id="disconnectWallet" class="disconnect-btn">×</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Admin Panel Modal -->
+        <div id="adminPanelModal" class="admin-modal hidden">
+            <div class="admin-modal-content">
+                <div class="admin-modal-header">
+                    <h2>🔐 Admin Panel</h2>
+                    <button id="closeAdminModal" class="close-btn">×</button>
+                </div>
+                <div class="admin-modal-body">
+                    <div class="admin-section">
+                        <h3>👥 User Management</h3>
+                        <div class="admin-controls">
+                            <input type="text" id="userSearchInput" placeholder="Search users..." class="admin-input">
+                            <button id="addUserBtn" class="admin-btn">Add New User</button>
+                        </div>
+                        <div class="users-list-container">
+                            <div id="usersList" class="users-list">
+                                <!-- Users will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="admin-section">
+                        <h3>📊 Statistics</h3>
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <span class="stat-label">Total Users</span>
+                                <span id="totalUsers" class="stat-value">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Active Users</span>
+                                <span id="activeUsers" class="stat-value">0</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="admin-section">
+                        <h3>🔍 Recent Activity</h3>
+                        <div id="recentActivity" class="activity-log">
+                            <p class="no-activity">No recent activity</p>
+                        </div>
+                    </div>
+                        </div>
+    </div>
+</div>
+
+        <!-- Add User Modal -->
+        <div id="addUserModal" class="admin-modal hidden">
+            <div class="admin-modal-content">
+                <div class="admin-modal-header">
+                    <h2>➕ Add New User</h2>
+                    <button id="closeAddUserModal" class="close-btn">×</button>
+                </div>
+                <div class="admin-modal-body">
+                    <div class="admin-section">
+                        <div class="admin-controls">
+                            <input type="text" id="newUserAddress" placeholder="Enter wallet address" class="admin-input">
+                            <button id="confirmAddUserBtn" class="admin-btn">Add User</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <main class="main-content">
+            <section id="home" class="hero-section">
+                <div class="hero-content">
+                    <h2 class="hero-title">Welcome to the Future</h2>
+                    <p class="hero-description">
+                        Join Trimark Industries in the vast expanse of EVE Frontier. 
+                        We specialize in advanced manufacturing, strategic operations, 
+                        and pioneering the next generation of space exploration.
+                    </p>
+                    <div class="hero-buttons">
+                        <button class="cta-btn primary">Join Our Corporation</button>
+                        <button class="cta-btn secondary">Learn More</button>
+                    </div>
+                </div>
+                
+                <div class="hero-visual">
+                    <div class="space-station">
+                        <div class="station-core"></div>
+                        <div class="station-ring"></div>
+                        <div class="station-details"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="about" class="about-section">
+                <h2 class="section-title">About Trimark Industries</h2>
+                <div class="about-grid">
+                    <div class="about-card">
+                        <div class="card-icon">🏭</div>
+                        <h3>Manufacturing Excellence</h3>
+                        <p>State-of-the-art production facilities across multiple star systems, specializing in advanced components and strategic assets.</p>
+                    </div>
+                    <div class="about-card">
+                        <div class="card-icon">🚀</div>
+                        <h3>Space Operations</h3>
+                        <p>Expert pilots and strategic operations teams ensuring safe passage and efficient resource management across the galaxy.</p>
+                    </div>
+                    <div class="about-card">
+                        <div class="card-icon">⚡</div>
+                        <h3>Energy Management</h3>
+                        <p>Advanced power systems and energy optimization for maximum efficiency in all our operations.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="services" class="services-section">
+                <h2 class="section-title">Our Services</h2>
+                <div class="services-grid">
+                    <div class="service-item">
+                        <h3>Smart Storage Solutions</h3>
+                        <p>Secure and efficient storage systems for all your valuable assets and resources.</p>
+                    </div>
+                    <div class="service-item">
+                        <h3>Manufacturing & Assembly</h3>
+                        <p>Custom manufacturing services for specialized equipment and components.</p>
+                    </div>
+                    <div class="service-item">
+                        <h3>Network Infrastructure</h3>
+                        <p>Reliable communication and data networks spanning multiple star systems.</p>
+                    </div>
+                    <div class="service-item">
+                        <h3>Strategic Consulting</h3>
+                        <p>Expert advice on expansion, resource management, and strategic positioning.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="contact" class="contact-section">
+                <h2 class="section-title">Contact Us</h2>
+                <div class="contact-content">
+                    <div class="contact-info">
+                        <h3>Get in Touch</h3>
+                        <p>Ready to join Trimark Industries? Connect your wallet and let's explore the future together.</p>
+                        <div class="contact-details">
+                            <div class="contact-item">
+                                <span class="contact-icon">📍</span>
+                                <span>Multiple Star Systems</span>
+                            </div>
+                            <div class="contact-item">
+                                <span class="contact-icon">🌌</span>
+                                <span>EVE Frontier Universe</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="contact-form">
+                        <div class="form-group">
+                            <label for="message">Message</label>
+                            <textarea id="message" placeholder="Tell us about your interest in joining Trimark Industries..."></textarea>
+                        </div>
+                        <button class="submit-btn">Send Message</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <img src="ChatGPT_Image_Jul_3_2025_08_34_57_PM.png" alt="Trimark Industries Logo" class="footer-corp-logo">
+                        <div>
+                            <h4>Trimark Industries</h4>
+                            <p>Forging the future in EVE Frontier</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <a href="#home">Home</a>
+                    <a href="#about">About</a>
+                    <a href="#services">Services</a>
+                </div>
+                <div class="footer-section">
+                    <h4>Connect</h4>
+                    <p>Join our corporation today</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Trimark Industries. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
