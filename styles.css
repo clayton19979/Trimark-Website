@@ -1143,42 +1143,7 @@ body {
     border: 1px solid rgba(0, 212, 255, 0.2);
 }
 
-/* Initial Connect Message Styles */
-.initial-connect-message {
-    background: linear-gradient(135deg, #1a1a2e, #16213e);
-    border: 2px solid #00d4ff;
-    border-radius: 15px;
-    margin: 20px auto;
-    max-width: 600px;
-    padding: 30px;
-    text-align: center;
-    box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
-    animation: initialMessageSlideIn 0.5s ease-out;
-}
 
-@keyframes initialMessageSlideIn {
-    from {
-        opacity: 0;
-        transform: translateY(-30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.initial-connect-content h3 {
-    color: #00d4ff;
-    font-size: 1.8rem;
-    margin-bottom: 20px;
-    font-family: 'Orbitron', monospace;
-}
-
-.initial-connect-content p {
-    color: #ccc;
-    margin-bottom: 15px;
-    line-height: 1.6;
-}
 
 .initial-connect-content strong {
     color: #00d4ff;

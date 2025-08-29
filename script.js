@@ -62,8 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {
             footer.style.display = 'none';
         }
         
-        // Show initial connect wallet message
-        showInitialConnectMessage();
+        // No initial message needed
         
         checkWalletConnection();
         
@@ -87,6 +86,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     footer.style.display = 'block';
                 }
             }
+        }
+        
+        // Also check admin status for any existing approved users
+        if (currentAccount) {
+            setTimeout(() => {
+                loadApprovedUsers();
+                checkAdminStatus();
+            }, 1000);
         }
     }, 500);
 });
@@ -473,11 +480,7 @@ async function updateUserProfile() {
                 accessDeniedMessage.remove();
             }
             
-            // Remove initial connect message if it exists
-            const initialMessage = document.getElementById('initialConnectMessage');
-            if (initialMessage) {
-                initialMessage.remove();
-            }
+
             
             // Add success animation
             userProfile.style.animation = 'fadeIn 0.5s ease-in';
@@ -513,40 +516,7 @@ function hasRequiredTribeAccess(userData) {
     return hasAccess;
 }
 
-// Show initial connect wallet message
-function showInitialConnectMessage() {
-    // Remove any existing initial message
-    const existingMessage = document.getElementById('initialConnectMessage');
-    if (existingMessage) {
-        existingMessage.remove();
-    }
-    
-    // Create initial message
-    const messageDiv = document.createElement('div');
-    messageDiv.id = 'initialConnectMessage';
-    messageDiv.className = 'initial-connect-message';
-    messageDiv.innerHTML = `
-        <div class="initial-connect-content">
-            <h3>🔐 Welcome to Trimark Industries</h3>
-            <p>This site is restricted to members of <strong>Trimark Industries</strong></p>
-            <p>Please connect your wallet to verify your tribe membership and access the site.</p>
-            <div class="discord-help-section">
-                <p>💬 Need help joining the tribe?</p>
-                <a href="https://discord.gg/7ym36qS9" target="_blank" class="discord-invite-btn">
-                    <span class="discord-icon">📱</span>
-                    Join Our Discord
-                </a>
-                <p class="discord-help-text">Join our Discord server to get help getting approved in-game!</p>
-            </div>
-        </div>
-    `;
-    
-    // Insert message after the header
-    const header = document.querySelector('.header');
-    if (header) {
-        header.parentNode.insertBefore(messageDiv, header.nextSibling);
-    }
-}
+
 
 // Show access denied message
 function showAccessDeniedMessage() {
@@ -767,6 +737,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
+    // Also check admin status periodically for approved users
+    setInterval(() => {
+        if (currentAccount) {
+            loadApprovedUsers();
+            checkAdminStatus();
+        }
+    }, 5000); // Check every 5 seconds
+    
     // Add scroll animations
     const observerOptions = {
         threshold: 0.1,
@@ -838,7 +816,15 @@ document.head.appendChild(style);
 
 // Admin Panel Functions
 function checkAdminStatus() {
-    // First check if user has tribe access
+    // Check if user is admin or approved first (these users should always see admin panel)
+    if (currentAccount && (ADMIN_WALLETS.includes(currentAccount.toLowerCase()) || approvedUsers.includes(currentAccount.toLowerCase()))) {
+        isAdmin = true;
+        showAdminButton();
+        console.log('✅ User is admin or approved - showing admin panel');
+        return;
+    }
+    
+    // For non-admin users, check tribe access
     const userData = JSON.parse(localStorage.getItem('trimark_user_data') || '{}');
     if (!hasRequiredTribeAccess(userData)) {
         isAdmin = false;
@@ -847,16 +833,10 @@ function checkAdminStatus() {
         return;
     }
     
-    // Then check admin status
-    if (currentAccount && (ADMIN_WALLETS.includes(currentAccount.toLowerCase()) || approvedUsers.includes(currentAccount.toLowerCase()))) {
-        isAdmin = true;
-        showAdminButton();
-        console.log('✅ User is admin or approved');
-    } else {
-        isAdmin = false;
-        hideAdminButton();
-        console.log('❌ User is not admin or approved');
-    }
+    // User has tribe access but is not admin/approved
+    isAdmin = false;
+    hideAdminButton();
+    console.log('❌ User has tribe access but is not admin or approved');
 }
 
 function showAdminButton() {
