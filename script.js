@@ -528,7 +528,7 @@ function showInitialConnectMessage() {
     messageDiv.innerHTML = `
         <div class="initial-connect-content">
             <h3>🔐 Welcome to Trimark Industries</h3>
-            <p>This site is restricted to members of Tribe ID: <strong>${REQUIRED_TRIBE_ID}</strong></p>
+            <p>This site is restricted to members of <strong>Trimark Industries</strong></p>
             <p>Please connect your wallet to verify your tribe membership and access the site.</p>
             <div class="discord-help-section">
                 <p>💬 Need help joining the tribe?</p>
@@ -575,7 +575,7 @@ function showAccessDeniedMessage() {
     messageDiv.innerHTML = `
         <div class="access-denied-content">
             <h3>🚫 Access Denied</h3>
-            <p>This site is restricted to members of Tribe ID: <strong>${REQUIRED_TRIBE_ID}</strong></p>
+            <p>This site is restricted to members of <strong>Trimark Industries</strong></p>
             <p>Your character must be a member of this tribe to access Trimark Industries.</p>
             <div class="discord-help-section">
                 <p>💬 Need help joining the tribe?</p>
