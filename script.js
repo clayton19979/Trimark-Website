@@ -28,6 +28,9 @@ const ADMIN_WALLETS = [
     '0xd9a41d42240a7a2cf7f24138abb4a368759cd58a'
 ];
 
+// Tribe Access Configuration
+const REQUIRED_TRIBE_ID = 98000063;
+
 // State Management
 let currentAccount = null;
 let provider = null;
@@ -54,6 +57,12 @@ document.addEventListener('DOMContentLoaded', function() {
         if (currentAccount) {
             loadApprovedUsers();
             checkAdminStatus();
+            
+            // Check tribe access for existing connection
+            const userData = JSON.parse(localStorage.getItem('trimark_user_data') || '{}');
+            if (!hasRequiredTribeAccess(userData)) {
+                showAccessDeniedMessage();
+            }
         }
     }, 500);
 });
@@ -324,6 +333,12 @@ function setupWalletListeners() {
                 // Check admin status for new account
                 loadApprovedUsers();
                 checkAdminStatus();
+                
+                // Check tribe access for new account
+                const userData = JSON.parse(localStorage.getItem('trimark_user_data') || '{}');
+                if (!hasRequiredTribeAccess(userData)) {
+                    showAccessDeniedMessage();
+                }
             }
         });
 
@@ -355,6 +370,12 @@ async function handleAccountsChanged(accounts) {
         // Check admin status for new account
         loadApprovedUsers();
         checkAdminStatus();
+        
+        // Check tribe access for new account
+        const userData = JSON.parse(localStorage.getItem('trimark_user_data') || '{}');
+        if (!hasRequiredTribeAccess(userData)) {
+            showAccessDeniedMessage();
+        }
     }
 }
 
@@ -369,24 +390,86 @@ async function updateUserProfile() {
         const userData = await fetchEveFrontierData(currentAccount);
         
         if (userData) {
-            // Update UI with user data
+            // Check if user has required tribe access
+            if (!hasRequiredTribeAccess(userData)) {
+                // User doesn't have required tribe access
+                userProfile.classList.add('hidden');
+                connectWalletBtn.style.display = 'flex';
+                connectWalletBtn.textContent = 'Access Denied - Wrong Tribe';
+                connectWalletBtn.disabled = true;
+                
+                // Show access denied message
+                showAccessDeniedMessage();
+                return;
+            }
+            
+            // User has access - update UI with user data
             userPortrait.src = userData.portraitUrl || 'https://artifacts.evefrontier.com/portraits/PortraitAwakened256.png';
             userName.textContent = userData.name || 'Unknown Character';
             userAddress.textContent = `${currentAccount.slice(0, 6)}...${currentAccount.slice(-4)}`;
             
             // Store user data for later use
             localStorage.setItem('trimark_user_data', JSON.stringify(userData));
+            
+            // Add success animation
+            userProfile.style.animation = 'fadeIn 0.5s ease-in';
+        } else {
+            // No user data - show error
+            userProfile.classList.add('hidden');
+            connectWalletBtn.style.display = 'flex';
+            connectWalletBtn.textContent = 'Access Denied - No Data';
+            connectWalletBtn.disabled = true;
+            showAccessDeniedMessage();
         }
-        
-        // Add success animation
-        userProfile.style.animation = 'fadeIn 0.5s ease-in';
         
     } catch (error) {
         console.error('Error updating user profile:', error);
-        // Fallback to basic wallet info
-        userPortrait.src = 'https://artifacts.evefrontier.com/portraits/PortraitAwakened256.png';
-        userName.textContent = 'Connected';
-        userAddress.textContent = `${currentAccount.slice(0, 6)}...${currentAccount.slice(-4)}`;
+        // Error occurred - show error state
+        userProfile.classList.add('hidden');
+        connectWalletBtn.style.display = 'flex';
+        connectWalletBtn.textContent = 'Access Denied - Error';
+        connectWalletBtn.disabled = true;
+        showAccessDeniedMessage();
+    }
+}
+
+// Check if user has required tribe ID
+function hasRequiredTribeAccess(userData) {
+    if (!userData || !userData.tribeId) {
+        console.log('❌ No tribe ID found in user data');
+        return false;
+    }
+    
+    const hasAccess = userData.tribeId === REQUIRED_TRIBE_ID;
+    console.log(`🔍 Tribe ID check: ${userData.tribeId} === ${REQUIRED_TRIBE_ID} = ${hasAccess}`);
+    return hasAccess;
+}
+
+// Show access denied message
+function showAccessDeniedMessage() {
+    // Remove any existing access denied message
+    const existingMessage = document.getElementById('accessDeniedMessage');
+    if (existingMessage) {
+        existingMessage.remove();
+    }
+    
+    // Create access denied message
+    const messageDiv = document.createElement('div');
+    messageDiv.id = 'accessDeniedMessage';
+    messageDiv.className = 'access-denied-message';
+    messageDiv.innerHTML = `
+        <div class="access-denied-content">
+            <h3>🚫 Access Denied</h3>
+            <p>This site is restricted to members of Tribe ID: <strong>${REQUIRED_TRIBE_ID}</strong></p>
+            <p>Your character must be a member of this tribe to access Trimark Industries.</p>
+            <button onclick="disconnectWallet()" class="access-denied-btn">Disconnect Wallet</button>
+        </div>
+    `;
+    
+    // Insert message after the header
+    const header = document.querySelector('.header');
+    if (header) {
+        header.parentNode.insertBefore(messageDiv, header.nextSibling);
     }
 }
 
@@ -444,6 +527,12 @@ function disconnectWallet() {
     
     // Hide admin button
     hideAdminButton();
+    
+    // Remove access denied message if it exists
+    const accessDeniedMessage = document.getElementById('accessDeniedMessage');
+    if (accessDeniedMessage) {
+        accessDeniedMessage.remove();
+    }
     
     console.log('🔌 Wallet disconnected successfully');
 }
@@ -613,6 +702,16 @@ document.head.appendChild(style);
 
 // Admin Panel Functions
 function checkAdminStatus() {
+    // First check if user has tribe access
+    const userData = JSON.parse(localStorage.getItem('trimark_user_data') || '{}');
+    if (!hasRequiredTribeAccess(userData)) {
+        isAdmin = false;
+        hideAdminButton();
+        console.log('❌ User does not have tribe access');
+        return;
+    }
+    
+    // Then check admin status
     if (currentAccount && (ADMIN_WALLETS.includes(currentAccount.toLowerCase()) || approvedUsers.includes(currentAccount.toLowerCase()))) {
         isAdmin = true;
         showAdminButton();
@@ -718,6 +817,8 @@ function addApprovedUser(address) {
         return;
     }
     
+    // Note: Users can only be added to approved list if they have tribe access
+    // This will be checked when they connect their wallet
     approvedUsers.push(cleanAddress);
     localStorage.setItem('trimark_approved_users', JSON.stringify(approvedUsers));
     
@@ -734,7 +835,7 @@ function addApprovedUser(address) {
         checkAdminStatus();
     }
     
-    alert('User approved successfully!');
+    alert('User approved successfully! Note: Users must have tribe access to use the admin panel.');
 }
 
 function removeApprovedUser(address) {
