@@ -51,6 +51,20 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(() => {
         initializeApp();
         setupEventListeners();
+        
+        // Initially hide main content and footer until user connects and is verified
+        const mainContent = document.querySelector('.main-content');
+        if (mainContent) {
+            mainContent.style.display = 'none';
+        }
+        const footer = document.querySelector('.footer');
+        if (footer) {
+            footer.style.display = 'none';
+        }
+        
+        // Show initial connect wallet message
+        showInitialConnectMessage();
+        
         checkWalletConnection();
         
         // Check if user is already connected and should see admin panel
@@ -62,6 +76,16 @@ document.addEventListener('DOMContentLoaded', function() {
             const userData = JSON.parse(localStorage.getItem('trimark_user_data') || '{}');
             if (!hasRequiredTribeAccess(userData)) {
                 showAccessDeniedMessage();
+            } else {
+                // User has access, ensure content is visible
+                const mainContent = document.querySelector('.main-content');
+                if (mainContent) {
+                    mainContent.style.display = 'block';
+                }
+                const footer = document.querySelector('.footer');
+                if (footer) {
+                    footer.style.display = 'block';
+                }
             }
         }
     }, 500);
@@ -338,6 +362,16 @@ function setupWalletListeners() {
                 const userData = JSON.parse(localStorage.getItem('trimark_user_data') || '{}');
                 if (!hasRequiredTribeAccess(userData)) {
                     showAccessDeniedMessage();
+                } else {
+                    // User has access, ensure content is visible
+                    const mainContent = document.querySelector('.main-content');
+                    if (mainContent) {
+                        mainContent.style.display = 'block';
+                    }
+                    const footer = document.querySelector('.footer');
+                    if (footer) {
+                        footer.style.display = 'block';
+                    }
                 }
             }
         });
@@ -375,6 +409,16 @@ async function handleAccountsChanged(accounts) {
         const userData = JSON.parse(localStorage.getItem('trimark_user_data') || '{}');
         if (!hasRequiredTribeAccess(userData)) {
             showAccessDeniedMessage();
+        } else {
+            // User has access, ensure content is visible
+            const mainContent = document.querySelector('.main-content');
+            if (mainContent) {
+                mainContent.style.display = 'block';
+            }
+            const footer = document.querySelector('.footer');
+            if (footer) {
+                footer.style.display = 'block';
+            }
         }
     }
 }
@@ -411,6 +455,30 @@ async function updateUserProfile() {
             // Store user data for later use
             localStorage.setItem('trimark_user_data', JSON.stringify(userData));
             
+            // Restore main content visibility for users with access
+            const mainContent = document.querySelector('.main-content');
+            if (mainContent) {
+                mainContent.style.display = 'block';
+            }
+            
+            // Restore footer visibility for users with access
+            const footer = document.querySelector('.footer');
+            if (footer) {
+                footer.style.display = 'block';
+            }
+            
+            // Remove access denied message if it exists
+            const accessDeniedMessage = document.getElementById('accessDeniedMessage');
+            if (accessDeniedMessage) {
+                accessDeniedMessage.remove();
+            }
+            
+            // Remove initial connect message if it exists
+            const initialMessage = document.getElementById('initialConnectMessage');
+            if (initialMessage) {
+                initialMessage.remove();
+            }
+            
             // Add success animation
             userProfile.style.animation = 'fadeIn 0.5s ease-in';
         } else {
@@ -445,12 +513,59 @@ function hasRequiredTribeAccess(userData) {
     return hasAccess;
 }
 
+// Show initial connect wallet message
+function showInitialConnectMessage() {
+    // Remove any existing initial message
+    const existingMessage = document.getElementById('initialConnectMessage');
+    if (existingMessage) {
+        existingMessage.remove();
+    }
+    
+    // Create initial message
+    const messageDiv = document.createElement('div');
+    messageDiv.id = 'initialConnectMessage';
+    messageDiv.className = 'initial-connect-message';
+    messageDiv.innerHTML = `
+        <div class="initial-connect-content">
+            <h3>🔐 Welcome to Trimark Industries</h3>
+            <p>This site is restricted to members of Tribe ID: <strong>${REQUIRED_TRIBE_ID}</strong></p>
+            <p>Please connect your wallet to verify your tribe membership and access the site.</p>
+            <div class="discord-help-section">
+                <p>💬 Need help joining the tribe?</p>
+                <a href="https://discord.gg/7ym36qS9" target="_blank" class="discord-invite-btn">
+                    <span class="discord-icon">📱</span>
+                    Join Our Discord
+                </a>
+                <p class="discord-help-text">Join our Discord server to get help getting approved in-game!</p>
+            </div>
+        </div>
+    `;
+    
+    // Insert message after the header
+    const header = document.querySelector('.header');
+    if (header) {
+        header.parentNode.insertBefore(messageDiv, header.nextSibling);
+    }
+}
+
 // Show access denied message
 function showAccessDeniedMessage() {
     // Remove any existing access denied message
     const existingMessage = document.getElementById('accessDeniedMessage');
     if (existingMessage) {
         existingMessage.remove();
+    }
+    
+    // Hide all main content sections
+    const mainContent = document.querySelector('.main-content');
+    if (mainContent) {
+        mainContent.style.display = 'none';
+    }
+    
+    // Hide footer
+    const footer = document.querySelector('.footer');
+    if (footer) {
+        footer.style.display = 'none';
     }
     
     // Create access denied message
@@ -462,6 +577,15 @@ function showAccessDeniedMessage() {
             <h3>🚫 Access Denied</h3>
             <p>This site is restricted to members of Tribe ID: <strong>${REQUIRED_TRIBE_ID}</strong></p>
             <p>Your character must be a member of this tribe to access Trimark Industries.</p>
+            <div class="discord-help-section">
+                <p>💬 Need help joining the tribe?</p>
+                <a href="https://discord.gg/7ym36qS9" target="_blank" class="discord-invite-btn">
+                    <span class="discord-icon">📱</span>
+                    Join Our Discord
+                </a>
+                <p class="discord-help-text">Join our Discord server to get help getting approved in-game!</p>
+                <p class="discord-note">Once you're part of the tribe in-game, reconnect your wallet to access the site.</p>
+            </div>
             <button onclick="disconnectWallet()" class="access-denied-btn">Disconnect Wallet</button>
         </div>
     `;
@@ -532,6 +656,18 @@ function disconnectWallet() {
     const accessDeniedMessage = document.getElementById('accessDeniedMessage');
     if (accessDeniedMessage) {
         accessDeniedMessage.remove();
+    }
+    
+    // Restore main content visibility
+    const mainContent = document.querySelector('.main-content');
+    if (mainContent) {
+        mainContent.style.display = 'block';
+    }
+    
+    // Restore footer visibility
+    const footer = document.querySelector('.footer');
+    if (footer) {
+        footer.style.display = 'block';
     }
     
     console.log('🔌 Wallet disconnected successfully');

@@ -1081,3 +1081,105 @@ body {
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(255, 68, 68, 0.4);
 }
+
+/* Discord Help Section Styles */
+.discord-help-section {
+    margin: 25px 0;
+    padding: 20px;
+    background: rgba(88, 101, 242, 0.1);
+    border: 1px solid rgba(88, 101, 242, 0.3);
+    border-radius: 12px;
+    text-align: center;
+}
+
+.discord-help-section p {
+    margin-bottom: 15px;
+    color: #b8bbff;
+    font-weight: 500;
+}
+
+.discord-invite-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, #5865f2, #4752c4);
+    color: white;
+    text-decoration: none;
+    padding: 12px 25px;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    margin: 15px 0;
+    border: 2px solid rgba(88, 101, 242, 0.3);
+}
+
+.discord-invite-btn:hover {
+    background: linear-gradient(135deg, #4752c4, #3c45a5);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(88, 101, 242, 0.4);
+    border-color: rgba(88, 101, 242, 0.6);
+}
+
+.discord-icon {
+    font-size: 1.2rem;
+}
+
+.discord-help-text {
+    font-size: 0.9rem;
+    color: #8b9dff;
+    font-style: italic;
+    margin-top: 10px;
+}
+
+.discord-note {
+    font-size: 0.85rem;
+    color: #00d4ff;
+    font-weight: 500;
+    margin-top: 15px;
+    padding: 8px 15px;
+    background: rgba(0, 212, 255, 0.1);
+    border-radius: 8px;
+    border: 1px solid rgba(0, 212, 255, 0.2);
+}
+
+/* Initial Connect Message Styles */
+.initial-connect-message {
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    border: 2px solid #00d4ff;
+    border-radius: 15px;
+    margin: 20px auto;
+    max-width: 600px;
+    padding: 30px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+    animation: initialMessageSlideIn 0.5s ease-out;
+}
+
+@keyframes initialMessageSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.initial-connect-content h3 {
+    color: #00d4ff;
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    font-family: 'Orbitron', monospace;
+}
+
+.initial-connect-content p {
+    color: #ccc;
+    margin-bottom: 15px;
+    line-height: 1.6;
+}
+
+.initial-connect-content strong {
+    color: #00d4ff;
+}
