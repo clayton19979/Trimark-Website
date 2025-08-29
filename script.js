@@ -49,6 +49,12 @@ document.addEventListener('DOMContentLoaded', function() {
         initializeApp();
         setupEventListeners();
         checkWalletConnection();
+        
+        // Check if user is already connected and should see admin panel
+        if (currentAccount) {
+            loadApprovedUsers();
+            checkAdminStatus();
+        }
     }, 500);
 });
 
@@ -110,7 +116,8 @@ async function checkExistingConnection() {
                 // Update UI
                 await updateUserProfile();
                 
-                // Check admin status
+                // Load approved users first, then check admin status
+                loadApprovedUsers();
                 checkAdminStatus();
                 
                 setupWalletListeners();
@@ -282,7 +289,8 @@ async function connectWallet() {
         // Update UI
         await updateUserProfile();
         
-        // Check admin status
+        // Load approved users first, then check admin status
+        loadApprovedUsers();
         checkAdminStatus();
         
         // Set up wallet event listeners
@@ -313,6 +321,9 @@ function setupWalletListeners() {
             } else {
                 currentAccount = accounts[0];
                 updateUserProfile();
+                // Check admin status for new account
+                loadApprovedUsers();
+                checkAdminStatus();
             }
         });
 
@@ -341,6 +352,9 @@ async function handleAccountsChanged(accounts) {
     } else if (accounts[0] !== currentAccount) {
         currentAccount = accounts[0];
         await updateUserProfile();
+        // Check admin status for new account
+        loadApprovedUsers();
+        checkAdminStatus();
     }
 }
 
@@ -520,6 +534,14 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
+    // Add page visibility change listener to refresh admin status
+    document.addEventListener('visibilitychange', function() {
+        if (!document.hidden && currentAccount) {
+            loadApprovedUsers();
+            checkAdminStatus();
+        }
+    });
+    
     // Add scroll animations
     const observerOptions = {
         threshold: 0.1,
@@ -591,14 +613,14 @@ document.head.appendChild(style);
 
 // Admin Panel Functions
 function checkAdminStatus() {
-    if (currentAccount && ADMIN_WALLETS.includes(currentAccount.toLowerCase())) {
+    if (currentAccount && (ADMIN_WALLETS.includes(currentAccount.toLowerCase()) || approvedUsers.includes(currentAccount.toLowerCase()))) {
         isAdmin = true;
         showAdminButton();
-        console.log('✅ User is admin');
+        console.log('✅ User is admin or approved');
     } else {
         isAdmin = false;
         hideAdminButton();
-        console.log('❌ User is not admin');
+        console.log('❌ User is not admin or approved');
     }
 }
 
@@ -706,6 +728,11 @@ function addApprovedUser(address) {
     updateAdminStats();
     renderUsersList();
     loadRecentActivity();
+    
+    // Check if the current user is the one being added, and update their admin status
+    if (currentAccount && currentAccount.toLowerCase() === cleanAddress) {
+        checkAdminStatus();
+    }
     
     alert('User approved successfully!');
 }
