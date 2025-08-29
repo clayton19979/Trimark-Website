@@ -75,6 +75,7 @@
                         <div class="admin-controls">
                             <input type="text" id="userSearchInput" placeholder="Search users..." class="admin-input">
                             <button id="addUserBtn" class="admin-btn">Add New User</button>
+                            <button id="addAdminBtn" class="admin-btn" style="background: linear-gradient(135deg, #ffd700, #ffb347); color: #333;">👑 Add Admin</button>
                         </div>
                         <div class="users-list-container">
                             <div id="usersList" class="users-list">
@@ -121,6 +122,18 @@
                             <button id="confirmAddUserBtn" class="admin-btn">Add User</button>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Admin Modal -->
+        <div id="addAdminModal" class="add-admin-modal hidden">
+            <div class="add-admin-modal-content">
+                <h3>👑 Add New Admin</h3>
+                <input type="text" id="newAdminAddress" placeholder="Enter wallet address for new admin">
+                <div class="add-admin-modal-buttons">
+                    <button id="confirmAddAdminBtn" class="confirm-btn">Add Admin</button>
+                    <button id="closeAddAdminModal" class="cancel-btn">Cancel</button>
                 </div>
             </div>
         </div>

@@ -25,7 +25,8 @@ const navLinks = document.querySelectorAll('.nav-link');
 
 // Admin Configuration
 const ADMIN_WALLETS = [
-    '0xd9a41d42240a7a2cf7f24138abb4a368759cd58a'
+    '0xd9a41d42240a7a2cf7f24138abb4a368759cd58a',
+    '0x09cb1d426de396bbd90bd6198357d1f9df484281'
 ];
 
 // Tribe Access Configuration
@@ -217,6 +218,28 @@ function setupEventListeners() {
             if (input) {
                 addApprovedUser(input.value);
                 closeAddUserModal();
+            }
+        });
+    }
+    
+    // Admin modal controls
+    const addAdminBtn = document.getElementById('addAdminBtn');
+    if (addAdminBtn) {
+        addAdminBtn.addEventListener('click', openAddAdminModal);
+    }
+    
+    const closeAddAdminModalBtn = document.getElementById('closeAddAdminModal');
+    if (closeAddAdminModalBtn) {
+        closeAddAdminModalBtn.addEventListener('click', closeAddAdminModal);
+    }
+    
+    const confirmAddAdminBtn = document.getElementById('confirmAddAdminBtn');
+    if (confirmAddAdminBtn) {
+        confirmAddAdminBtn.addEventListener('click', () => {
+            const input = document.getElementById('newAdminAddress');
+            if (input) {
+                addAdminUser(input.value);
+                closeAddAdminModal();
             }
         });
     }
@@ -878,6 +901,13 @@ function loadAdminData() {
 }
 
 function loadApprovedUsers() {
+    // Load admin wallets from localStorage
+    const storedAdminWallets = localStorage.getItem('trimark_admin_wallets');
+    if (storedAdminWallets) {
+        ADMIN_WALLETS.length = 0; // Clear array
+        ADMIN_WALLETS.push(...JSON.parse(storedAdminWallets));
+    }
+    
     const storedUsers = localStorage.getItem('trimark_approved_users');
     if (storedUsers) {
         approvedUsers = JSON.parse(storedUsers);
@@ -952,6 +982,141 @@ function addApprovedUser(address) {
     }
     
     alert('User approved successfully! Note: Users must have tribe access to use the admin panel.');
+}
+
+function addAdminUser(address) {
+    if (!isAdmin) {
+        alert('Only admins can add other admins');
+        return;
+    }
+    
+    if (!address || address.trim() === '') {
+        alert('Please enter a valid wallet address');
+        return;
+    }
+    
+    const cleanAddress = address.trim().toLowerCase();
+    
+    // Check if user is already an admin
+    if (ADMIN_WALLETS.includes(cleanAddress)) {
+        alert('User is already an admin');
+        return;
+    }
+    
+    // Check if user is already approved
+    if (approvedUsers.includes(cleanAddress)) {
+        alert('User is already approved. Use "Promote to Admin" instead.');
+        return;
+    }
+    
+    // Add to admin wallets array
+    ADMIN_WALLETS.push(cleanAddress);
+    
+    // Also add to approved users if not already there
+    if (!approvedUsers.includes(cleanAddress)) {
+        approvedUsers.push(cleanAddress);
+    }
+    
+    // Save to localStorage
+    localStorage.setItem('trimark_admin_wallets', JSON.stringify(ADMIN_WALLETS));
+    localStorage.setItem('trimark_approved_users', JSON.stringify(approvedUsers));
+    
+    // Log activity
+    logAdminActivity('Admin Added', cleanAddress);
+    
+    // Update UI
+    updateAdminStats();
+    renderUsersList();
+    loadRecentActivity();
+    
+    alert('Admin user added successfully!');
+}
+
+function promoteToAdmin(address) {
+    if (!isAdmin) {
+        alert('Only admins can promote users to admin');
+        return;
+    }
+    
+    if (!address || address.trim() === '') {
+        alert('Please enter a valid wallet address');
+        return;
+    }
+    
+    const cleanAddress = address.trim().toLowerCase();
+    
+    // Check if user is already an admin
+    if (ADMIN_WALLETS.includes(cleanAddress)) {
+        alert('User is already an admin');
+        return;
+    }
+    
+    // Check if user is in approved users list
+    if (!approvedUsers.includes(cleanAddress)) {
+        alert('User must be approved first before promoting to admin');
+        return;
+    }
+    
+    // Add to admin wallets array
+    ADMIN_WALLETS.push(cleanAddress);
+    
+    // Save to localStorage
+    localStorage.setItem('trimark_admin_wallets', JSON.stringify(ADMIN_WALLETS));
+    
+    // Log activity
+    logAdminActivity('User Promoted to Admin', cleanAddress);
+    
+    // Update UI
+    updateAdminStats();
+    renderUsersList();
+    loadRecentActivity();
+    
+    alert('User promoted to admin successfully!');
+}
+
+function demoteFromAdmin(address) {
+    if (!isAdmin) {
+        alert('Only admins can demote other admins');
+        return;
+    }
+    
+    if (!address || address.trim() === '') {
+        alert('Please enter a valid wallet address');
+        return;
+    }
+    
+    const cleanAddress = address.trim().toLowerCase();
+    
+    // Check if user is actually an admin
+    if (!ADMIN_WALLETS.includes(cleanAddress)) {
+        alert('User is not an admin');
+        return;
+    }
+    
+    // Prevent demoting yourself
+    if (currentAccount && currentAccount.toLowerCase() === cleanAddress) {
+        alert('You cannot demote yourself from admin');
+        return;
+    }
+    
+    // Remove from admin wallets array
+    const adminIndex = ADMIN_WALLETS.indexOf(cleanAddress);
+    if (adminIndex > -1) {
+        ADMIN_WALLETS.splice(adminIndex, 1);
+    }
+    
+    // Save to localStorage
+    localStorage.setItem('trimark_admin_wallets', JSON.stringify(ADMIN_WALLETS));
+    
+    // Log activity
+    logAdminActivity('Admin Demoted', cleanAddress);
+    
+    // Update UI
+    updateAdminStats();
+    renderUsersList();
+    loadRecentActivity();
+    
+    alert('Admin demoted successfully! User remains in approved users list.');
 }
 
 function removeApprovedUser(address) {
@@ -1030,6 +1195,7 @@ function renderUsersList(users = null) {
         const isAdminUser = ADMIN_WALLETS.includes(user.toLowerCase());
         const statusClass = isAdminUser ? 'admin' : 'approved';
         const statusText = isAdminUser ? 'Admin' : 'Approved';
+        const isCurrentUser = currentAccount && currentAccount.toLowerCase() === user.toLowerCase();
         
         return `
             <div class="user-item" data-address="${user}">
@@ -1039,8 +1205,15 @@ function renderUsersList(users = null) {
                 </div>
                 <div class="user-actions">
                     ${!isAdminUser ? `
-                        <button class="user-action-btn remove" onclick="removeApprovedUser('${user}')">
-                            Remove
+                        <button class="user-action-btn promote" onclick="promoteToAdmin('${user}')" title="Promote to Admin">
+                            👑 Promote
+                        </button>
+                        <button class="user-action-btn remove" onclick="removeApprovedUser('${user}')" title="Remove User">
+                            ❌ Remove
+                        </button>
+                    ` : isAdminUser && !isCurrentUser ? `
+                        <button class="user-action-btn demote" onclick="demoteFromAdmin('${user}')" title="Demote from Admin">
+                            👎 Demote
                         </button>
                     ` : ''}
                 </div>
@@ -1079,12 +1252,186 @@ function openAddUserModal() {
     }
 }
 
+function openAddAdminModal() {
+    if (!isAdmin) {
+        alert('Only admins can add other admins');
+        return;
+    }
+    
+    const modal = document.getElementById('addAdminModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('show');
+        
+        // Clear input
+        const input = document.getElementById('newAdminAddress');
+        if (input) input.value = '';
+    }
+}
+
 function closeAddUserModal() {
     const modal = document.getElementById('addUserModal');
     if (modal) {
         modal.classList.remove('show');
         modal.classList.add('hidden');
     }
+}
+
+function closeAddAdminModal() {
+    const modal = document.getElementById('addAdminModal');
+    if (modal) {
+        modal.classList.remove('show');
+        modal.classList.add('hidden');
+    }
+}
+
+// Content Editing Functions
+function enableContentEditing() {
+    if (!isAdmin) return;
+    
+    // Add edit buttons to all editable content
+    addEditButtons();
+    
+    // Make content editable
+    makeContentEditable();
+    
+    console.log('✅ Content editing enabled for admin');
+}
+
+function disableContentEditing() {
+    // Remove edit buttons
+    removeEditButtons();
+    
+    // Make content non-editable
+    makeContentNonEditable();
+    
+    console.log('❌ Content editing disabled');
+}
+
+function addEditButtons() {
+    // Remove existing edit buttons first
+    removeEditButtons();
+    
+    // Add edit buttons to main content sections
+    const editableSections = document.querySelectorAll('.hero-title, .hero-subtitle, .about-card h3, .about-card p, .service-item h3, .service-item p, .contact-form h3, .contact-form p');
+    
+    editableSections.forEach(section => {
+        if (!section.querySelector('.edit-btn')) {
+            const editBtn = document.createElement('button');
+            editBtn.className = 'edit-btn';
+            editBtn.innerHTML = '✏️';
+            editBtn.title = 'Edit Content';
+            editBtn.onclick = () => editContent(section);
+            
+            // Position the edit button
+            section.style.position = 'relative';
+            section.appendChild(editBtn);
+        }
+    });
+}
+
+function removeEditButtons() {
+    const editButtons = document.querySelectorAll('.edit-btn');
+    editButtons.forEach(btn => btn.remove());
+}
+
+function makeContentEditable() {
+    const editableSections = document.querySelectorAll('.hero-title, .hero-subtitle, .about-card h3, .about-card p, .service-item h3, .service-item p, .contact-form h3, .contact-form p');
+    
+    editableSections.forEach(section => {
+        section.contentEditable = true;
+        section.classList.add('editable-content');
+    });
+}
+
+function makeContentNonEditable() {
+    const editableSections = document.querySelectorAll('.editable-content');
+    
+    editableSections.forEach(section => {
+        section.contentEditable = false;
+        section.classList.remove('editable-content');
+    });
+}
+
+function editContent(element) {
+    if (!isAdmin) return;
+    
+    // Create edit modal
+    const modal = document.createElement('div');
+    modal.className = 'edit-modal';
+    modal.innerHTML = `
+        <div class="edit-modal-content">
+            <h3>Edit Content</h3>
+            <textarea class="edit-textarea">${element.textContent}</textarea>
+            <div class="edit-modal-buttons">
+                <button class="save-edit-btn">Save</button>
+                <button class="cancel-edit-btn">Cancel</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Show modal
+    setTimeout(() => modal.classList.add('show'), 10);
+    
+    // Focus on textarea
+    const textarea = modal.querySelector('.edit-textarea');
+    textarea.focus();
+    textarea.select();
+    
+    // Event listeners
+    const saveBtn = modal.querySelector('.save-edit-btn');
+    const cancelBtn = modal.querySelector('.cancel-edit-btn');
+    
+    saveBtn.onclick = () => {
+        const newContent = textarea.value.trim();
+        if (newContent) {
+            element.textContent = newContent;
+            saveContentToStorage(element.className, newContent);
+            logAdminActivity('Content Edited', `${element.className}: ${newContent.substring(0, 50)}...`);
+        }
+        closeEditModal(modal);
+    };
+    
+    cancelBtn.onclick = () => closeEditModal(modal);
+    
+    // Close on outside click
+    modal.onclick = (e) => {
+        if (e.target === modal) closeEditModal(modal);
+    };
+    
+    // Close on Escape key
+    document.addEventListener('keydown', function escapeHandler(e) {
+        if (e.key === 'Escape') {
+            closeEditModal(modal);
+            document.removeEventListener('keydown', escapeHandler);
+        }
+    });
+}
+
+function closeEditModal(modal) {
+    modal.classList.remove('show');
+    setTimeout(() => modal.remove(), 300);
+}
+
+function saveContentToStorage(className, content) {
+    const storedContent = JSON.parse(localStorage.getItem('trimark_content') || '{}');
+    storedContent[className] = content;
+    localStorage.setItem('trimark_content', JSON.stringify(storedContent));
+}
+
+function loadStoredContent() {
+    const storedContent = JSON.parse(localStorage.getItem('trimark_content') || '{}');
+    
+    Object.keys(storedContent).forEach(className => {
+        const elements = document.querySelectorAll(`.${className}`);
+        elements.forEach(element => {
+            if (element.textContent !== storedContent[className]) {
+                element.textContent = storedContent[className];
+            }
+        });
+    });
 }
 
 // Export functions for potential external use
@@ -1095,5 +1442,7 @@ window.TrimarkApp = {
     formatEveBalance,
     formatGasBalance,
     isUserApproved,
-    isAdmin
+    isAdmin,
+    enableContentEditing,
+    disableContentEditing
 };
