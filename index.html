@@ -35,21 +35,21 @@
                 </div>
             </div>
             
-            <nav class="nav">
-                <a href="#home" class="nav-link active">Home</a>
-                <a href="#about" class="nav-link">About</a>
-                <a href="#services" class="nav-link">Services</a>
-                <a href="#contact" class="nav-link">Contact</a>
-            </nav>
+                         <nav class="nav">
+                 <a href="#home" class="nav-link active">Home</a>
+                 <a href="#about" class="nav-link">About</a>
+                 <a href="#services" class="nav-link">Services</a>
+                 <a href="#roles" class="nav-link">Roles</a>
+                 <a href="#events" class="nav-link">Events</a>
+                 <a href="#contact" class="nav-link">Contact</a>
+             </nav>
 
             <div class="wallet-section">
                 <button id="connectWallet" class="wallet-btn">
                     <span class="wallet-icon">🔗</span>
                     Connect Wallet
                 </button>
-                <button id="adminPanelBtn" class="wallet-btn" style="background: #9b59b6; margin-left: 10px; display: none;">
-                    Admin Panel
-                </button>
+
 
                 <div id="userProfile" class="user-profile hidden">
                     <img id="userPortrait" src="" alt="Character Portrait" class="user-portrait">
@@ -76,6 +76,7 @@
                             <input type="text" id="userSearchInput" placeholder="Search users..." class="admin-input">
                             <button id="addUserBtn" class="admin-btn">Add New User</button>
                             <button id="addAdminBtn" class="admin-btn" style="background: linear-gradient(135deg, #ffd700, #ffb347); color: #333;">👑 Add Admin</button>
+                            <button id="editContentBtn" class="admin-btn" style="background: linear-gradient(135deg, #ff6b6b, #ff4757);">✏️ Edit Content</button>
                         </div>
                         <div class="users-list-container">
                             <div id="usersList" class="users-list">
@@ -141,15 +142,15 @@
         <main class="main-content">
             <section id="home" class="hero-section">
                 <div class="hero-content">
-                    <h2 class="hero-title">Welcome to the Future</h2>
+                    <h2 class="hero-title">Welcome to Trimark Industries</h2>
                     <p class="hero-description">
-                        Join Trimark Industries in the vast expanse of EVE Frontier. 
-                        We specialize in advanced manufacturing, strategic operations, 
-                        and pioneering the next generation of space exploration.
+                        Welcome back, fellow frontier builders. Access your corporation dashboard, 
+                        view current operations, and stay updated on our latest industrial ventures 
+                        across the EVE Frontier universe.
                     </p>
                     <div class="hero-buttons">
-                        <button class="cta-btn primary">Join Our Corporation</button>
-                        <button class="cta-btn secondary">Learn More</button>
+                        <button class="cta-btn primary">View Dashboard</button>
+                        <button class="cta-btn secondary">Current Operations</button>
                     </div>
                 </div>
                 
@@ -163,70 +164,274 @@
             </section>
 
             <section id="about" class="about-section">
-                <h2 class="section-title">About Trimark Industries</h2>
-                <div class="about-grid">
-                    <div class="about-card">
-                        <div class="card-icon">🏭</div>
-                        <h3>Manufacturing Excellence</h3>
-                        <p>State-of-the-art production facilities across multiple star systems, specializing in advanced components and strategic assets.</p>
-                    </div>
-                    <div class="about-card">
-                        <div class="card-icon">🚀</div>
-                        <h3>Space Operations</h3>
-                        <p>Expert pilots and strategic operations teams ensuring safe passage and efficient resource management across the galaxy.</p>
-                    </div>
-                    <div class="about-card">
-                        <div class="card-icon">⚡</div>
-                        <h3>Energy Management</h3>
-                        <p>Advanced power systems and energy optimization for maximum efficiency in all our operations.</p>
-                    </div>
-                </div>
+                                 <h2 class="section-title">Member Resources</h2>
+                 <div class="about-grid">
+                     <div class="about-card">
+                         <div class="card-icon">📊</div>
+                         <h3>Operations Dashboard</h3>
+                         <p>Monitor current mining operations, manufacturing queues, and logistics status across all our active star systems.</p>
+                     </div>
+                     <div class="about-card">
+                         <div class="card-icon">📋</div>
+                         <h3>Mission Board</h3>
+                         <p>View available assignments, track your contributions, and coordinate with other members on strategic operations.</p>
+                     </div>
+                     <div class="about-card">
+                         <div class="card-icon">💼</div>
+                         <h3>Corporation Tools</h3>
+                         <p>Access specialized equipment, blueprints, and resources needed for your role within Trimark Industries.</p>
+                     </div>
+                 </div>
             </section>
 
             <section id="services" class="services-section">
-                <h2 class="section-title">Our Services</h2>
-                <div class="services-grid">
-                    <div class="service-item">
-                        <h3>Smart Storage Solutions</h3>
-                        <p>Secure and efficient storage systems for all your valuable assets and resources.</p>
+                                 <h2 class="section-title">Active Operations</h2>
+                 <div class="services-grid">
+                     <div class="service-item">
+                         <h3>Current Mining Sites</h3>
+                         <p>Real-time status of active extraction operations, resource yields, and security conditions across our mining territories.</p>
+                     </div>
+                     <div class="service-item">
+                         <h3>Manufacturing Status</h3>
+                         <p>Production queue updates, blueprint efficiency ratings, and quality control reports from our industrial facilities.</p>
+                     </div>
+                     <div class="service-item">
+                         <h3>Logistics Network</h3>
+                         <p>Current trade routes, supply chain status, and transportation schedules for optimal resource distribution.</p>
+                     </div>
+                     <div class="service-item">
+                         <h3>Security Updates</h3>
+                         <p>Latest intelligence on threats, safe passage recommendations, and coordination protocols for member safety.</p>
+                     </div>
+                 </div>
+                        </section>
+ 
+            <section id="roles" class="roles-section">
+                <h2 class="section-title">Role Management</h2>
+                <div class="roles-content">
+                    <div class="roles-info">
+                        <h3>Corporation Roles & Permissions</h3>
+                        <p>Manage member roles, assign responsibilities, and control access to different areas of Trimark Industries operations.</p>
+                        
+                                                 <div class="role-types">
+                             <div class="role-type">
+                                 <span class="role-icon">👑</span>
+                                 <span>Administrator</span>
+                                 <span class="role-desc">Full access to all systems and member management</span>
+                             </div>
+                             <div class="role-type">
+                                 <span class="role-icon">🤝</span>
+                                 <span>Diplomatic Officer</span>
+                                 <span class="role-desc">Handle diplomacy, negotiations, and external relations</span>
+                             </div>
+                             <div class="role-type">
+                                 <span class="role-icon">⚔️</span>
+                                 <span>Lead Tactician</span>
+                                 <span class="role-desc">Lead tactical operations and strategic combat planning</span>
+                             </div>
+                             <div class="role-type">
+                                 <span class="role-icon">🔍</span>
+                                 <span>Field Survey Lead</span>
+                                 <span class="role-desc">Lead exploration and resource assessment operations</span>
+                             </div>
+                             <div class="role-type">
+                                 <span class="role-icon">📢</span>
+                                 <span>Recruiter</span>
+                                 <span class="role-desc">Handle recruitment and member acquisition</span>
+                             </div>
+                             <div class="role-type">
+                                 <span class="role-icon">🌐</span>
+                                 <span>Ambassador</span>
+                                 <span class="role-desc">Represent the corporation in public relations and community</span>
+                             </div>
+                                                     <div class="role-type">
+                            <span class="role-icon">👥</span>
+                            <span>Crew Member</span>
+                            <span class="role-desc">Basic operations, combat support, and general duties</span>
+                        </div>
+                        <div class="role-type">
+                            <span class="role-icon">📅</span>
+                            <span>Event Coordinator</span>
+                            <span class="role-desc">Schedule and manage corporation events and operations</span>
+                        </div>
+                         </div>
                     </div>
-                    <div class="service-item">
-                        <h3>Manufacturing & Assembly</h3>
-                        <p>Custom manufacturing services for specialized equipment and components.</p>
-                    </div>
-                    <div class="service-item">
-                        <h3>Network Infrastructure</h3>
-                        <p>Reliable communication and data networks spanning multiple star systems.</p>
-                    </div>
-                    <div class="service-item">
-                        <h3>Strategic Consulting</h3>
-                        <p>Expert advice on expansion, resource management, and strategic positioning.</p>
+                    
+                                         <div class="roles-management">
+                         <h3>Role Assignment</h3>
+                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                             <div style="color: #888; font-size: 0.9rem;">
+                                 Tribe Members: <span id="tribeMemberCount" style="color: #00d4ff; font-weight: bold;">0</span>
+                             </div>
+                             <button onclick="refreshTribeMembers()" class="role-btn secondary" style="padding: 8px 16px; font-size: 0.9rem;">
+                                 🔄 Refresh Members
+                             </button>
+                         </div>
+                         <div class="role-assignment-form">
+                                                          <div class="form-group">
+                                  <label for="roleUserName">Character Name</label>
+                                  <input type="text" id="roleUserName" placeholder="Enter character name" class="role-input">
+                                  <small style="color: #888; font-size: 0.8rem; margin-top: 5px; display: block;">
+                                      Only Trimark Industries tribe members can be assigned roles. Start typing to see suggestions.
+                                  </small>
+                              </div>
+                            <div class="form-group">
+                                <label for="roleSelect">Select Role</label>
+                                                    <select id="roleSelect" class="role-select">
+                        <option value="">Choose a role...</option>
+                        <option value="administrator">👑 Administrator</option>
+                        <option value="diplomatic_officer">🤝 Diplomatic Officer</option>
+                        <option value="lead_tactician">⚔️ Lead Tactician</option>
+                        <option value="field_survey_lead">🔍 Field Survey Lead</option>
+                        <option value="recruiter">📢 Recruiter</option>
+                        <option value="ambassador">🌐 Ambassador</option>
+                        <option value="crew_member">👥 Crew Member</option>
+                        <option value="event_coordinator">📅 Event Coordinator</option>
+                    </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="roleReason">Reason for Assignment</label>
+                                <textarea id="roleReason" placeholder="Explain why this role is being assigned..." class="role-textarea"></textarea>
+                            </div>
+                            <button id="assignRoleBtn" class="role-btn primary">Assign Role</button>
+                        </div>
+                        
+                        <div class="pending-approvals">
+                            <h4>Pending Role Approvals</h4>
+                            <div id="pendingApprovalsList" class="approvals-list">
+                                <!-- Pending approvals will be populated here -->
+                            </div>
+                        </div>
+                        
+                                                 <div class="current-roles">
+                             <h4>Current Role Assignments</h4>
+                             <div id="currentRolesList" class="roles-list">
+                                 <!-- Current roles will be populated here -->
+                             </div>
+                         </div>
+                         
+                         <div class="role-request-form">
+                             <h4>Request a Role</h4>
+                             <p>Don't have the role you need? Submit a request for administrators to review.</p>
+                             <div class="form-group">
+                                 <label for="requestRoleSelect">Role Requested</label>
+                                                                     <select id="requestRoleSelect" class="role-select">
+                                        <option value="">Choose a role...</option>
+                                        <option value="diplomatic_officer">🤝 Diplomatic Officer</option>
+                                        <option value="lead_tactician">⚔️ Lead Tactician</option>
+                                        <option value="field_survey_lead">🔍 Field Survey Lead</option>
+                                        <option value="recruiter">📢 Recruiter</option>
+                                        <option value="ambassador">🌐 Ambassador</option>
+                                        <option value="crew_member">👥 Crew Member</option>
+                                        <option value="event_coordinator">📅 Event Coordinator</option>
+                                    </select>
+                             </div>
+                             <div class="form-group">
+                                 <label for="requestRoleReason">Why do you need this role?</label>
+                                 <textarea id="requestRoleReason" placeholder="Explain your experience and why this role would benefit the corporation..." class="role-textarea"></textarea>
+                             </div>
+                             <button id="requestRoleBtn" class="role-btn secondary">Submit Request</button>
+                         </div>
                     </div>
                 </div>
             </section>
-
-            <section id="contact" class="contact-section">
-                <h2 class="section-title">Contact Us</h2>
-                <div class="contact-content">
-                    <div class="contact-info">
-                        <h3>Get in Touch</h3>
-                        <p>Ready to join Trimark Industries? Connect your wallet and let's explore the future together.</p>
-                        <div class="contact-details">
-                            <div class="contact-item">
-                                <span class="contact-icon">📍</span>
-                                <span>Multiple Star Systems</span>
+            
+            <section id="events" class="events-section">
+                <h2 class="section-title">Corporation Events</h2>
+                <div class="events-content">
+                    <div class="events-info">
+                        <h3>Upcoming Operations & Events</h3>
+                        <p>Stay informed about scheduled operations, training sessions, and corporate events. Event Coordinators can create and manage events for the corporation.</p>
+                        
+                        <div class="event-types">
+                            <div class="event-type">
+                                <span class="event-icon">⚔️</span>
+                                <span>Combat Operations</span>
+                                <span class="event-desc">Strategic combat missions and fleet operations</span>
                             </div>
-                            <div class="contact-item">
-                                <span class="contact-icon">🌌</span>
-                                <span>EVE Frontier Universe</span>
+                            <div class="event-type">
+                                <span class="event-icon">🏭</span>
+                                <span>Manufacturing Runs</span>
+                                <span class="event-desc">Coordinated production and resource processing</span>
+                            </div>
+                            <div class="event-type">
+                                <span class="event-icon">🔍</span>
+                                <span>Exploration Missions</span>
+                                <span class="event-desc">Resource discovery and territory mapping</span>
+                            </div>
+                            <div class="event-type">
+                                <span class="event-icon">📚</span>
+                                <span>Training Sessions</span>
+                                <span class="event-desc">Skill development and tactical training</span>
                             </div>
                         </div>
                     </div>
-                    <div class="contact-form">
-                        <div class="form-group">
-                            <label for="message">Message</label>
-                            <textarea id="message" placeholder="Tell us about your interest in joining Trimark Industries..."></textarea>
+                    
+                    <div class="events-management">
+                        <div class="event-creation-form">
+                            <h4>Create New Event</h4>
+                            <p>Event Coordinators can schedule new operations and events for the corporation.</p>
+                            <div class="form-group">
+                                <label for="eventTitle">Event Title</label>
+                                <input type="text" id="eventTitle" placeholder="Enter event title" class="event-input">
+                            </div>
+                            <div class="form-group">
+                                <label for="eventDescription">Description</label>
+                                <textarea id="eventDescription" placeholder="Describe the event, objectives, and requirements..." class="event-textarea"></textarea>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="eventDate">Date</label>
+                                    <input type="date" id="eventDate" class="event-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="eventTime">Time</label>
+                                    <input type="time" id="eventTime" class="event-input">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="eventLocation">Location</label>
+                                <input type="text" id="eventLocation" placeholder="System, coordinates, or meeting point" class="event-input">
+                            </div>
+                            <button id="createEventBtn" class="event-btn primary">Create Event</button>
                         </div>
+                        
+                        <div class="events-list">
+                            <h4>Current Events</h4>
+                            <div id="eventsList" class="events-container">
+                                <!-- Events will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+ 
+            <section id="contact" class="contact-section">
+                <h2 class="section-title">Member Communication</h2>
+                <div class="contact-content">
+                                         <div class="contact-info">
+                         <h3>Corporation Updates</h3>
+                         <p>Stay informed about Trimark Industries operations, upcoming events, and strategic decisions that affect our corporation's future.</p>
+                         <div class="contact-details">
+                             <div class="contact-item">
+                                 <span class="contact-icon">📢</span>
+                                 <span>Announcements & News</span>
+                             </div>
+                             <div class="contact-item">
+                                 <span class="contact-icon">📅</span>
+                                 <span>Event Calendar</span>
+                             </div>
+                             <div class="contact-item">
+                                 <span class="contact-icon">💬</span>
+                                 <span>Member Forums</span>
+                             </div>
+                         </div>
+                     </div>
+                    <div class="contact-form">
+                                                 <div class="form-group">
+                             <label for="message">Message</label>
+                             <textarea id="message" placeholder="Share updates, report issues, or communicate with other members..."></textarea>
+                         </div>
                         <button class="submit-btn">Send Message</button>
                     </div>
                 </div>
@@ -238,22 +443,24 @@
                 <div class="footer-section">
                     <div class="footer-logo">
                         <img src="ChatGPT_Image_Jul_3_2025_08_34_57_PM.png" alt="Trimark Industries Logo" class="footer-corp-logo">
-                        <div>
-                            <h4>Trimark Industries</h4>
-                            <p>Forging the future in EVE Frontier</p>
-                        </div>
+                                                 <div>
+                             <h4>Trimark Industries</h4>
+                             <p>We don't follow the frontier. We build it.</p>
+                         </div>
                     </div>
                 </div>
-                <div class="footer-section">
-                    <h4>Quick Links</h4>
-                    <a href="#home">Home</a>
-                    <a href="#about">About</a>
-                    <a href="#services">Services</a>
-                </div>
-                <div class="footer-section">
-                    <h4>Connect</h4>
-                    <p>Join our corporation today</p>
-                </div>
+                                 <div class="footer-section">
+                     <h4>Quick Links</h4>
+                     <a href="#home">Home</a>
+                     <a href="#about">About</a>
+                     <a href="#services">Services</a>
+                     <a href="#roles">Roles</a>
+                     <a href="#events">Events</a>
+                 </div>
+                                                          <div class="footer-section">
+                             <h4>Connect</h4>
+                             <p>Stay connected with fellow members</p>
+                         </div>
             </div>
             <div class="footer-bottom">
                 <p>&copy; 2024 Trimark Industries. All rights reserved.</p>

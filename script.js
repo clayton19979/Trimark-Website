@@ -89,13 +89,30 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
-        // Also check admin status for any existing approved users
-        if (currentAccount) {
-            setTimeout(() => {
-                loadApprovedUsers();
-                checkAdminStatus();
-            }, 1000);
-        }
+                 // Also check admin status for any existing approved users
+         if (currentAccount) {
+             setTimeout(() => {
+                 loadApprovedUsers();
+                 checkAdminStatus();
+             }, 1000);
+         }
+         
+         // Initialize role management
+         initializeRoleManagement();
+         
+         // Initialize events system
+         initializeEvents();
+         
+         // Check if welcome screen should be shown
+         const welcomeShown = localStorage.getItem('trimark_welcome_shown');
+         if (welcomeShown) {
+             showWelcomeScreen = false;
+         }
+         
+         // Setup autocomplete after a delay to ensure DOM is ready
+         setTimeout(() => {
+             setupRoleAssignmentAutocomplete();
+         }, 1000);
     }, 500);
 });
 
@@ -187,11 +204,7 @@ function setupEventListeners() {
         console.error('Disconnect wallet button not found!');
     }
     
-    // Admin panel button
-    const adminPanelBtn = document.getElementById('adminPanelBtn');
-    if (adminPanelBtn) {
-        adminPanelBtn.addEventListener('click', openAdminPanel);
-    }
+
     
     // Admin panel modal controls
     const closeAdminModal = document.getElementById('closeAdminModal');
@@ -243,6 +256,79 @@ function setupEventListeners() {
             }
         });
     }
+    
+         // Edit content button
+     const editContentBtn = document.getElementById('editContentBtn');
+     if (editContentBtn) {
+         editContentBtn.addEventListener('click', toggleContentEditing);
+     }
+     
+           // Role assignment button
+      const assignRoleBtn = document.getElementById('assignRoleBtn');
+      if (assignRoleBtn) {
+          assignRoleBtn.addEventListener('click', () => {
+              const characterName = document.getElementById('roleUserName').value;
+              const role = document.getElementById('roleSelect').value;
+              const reason = document.getElementById('roleReason').value;
+              
+              if (!characterName || !role) {
+                  alert('Please provide both character name and role');
+                  return;
+              }
+              
+              assignRoleToUser(characterName, role, reason);
+          });
+      }
+     
+     // Role request button
+     const requestRoleBtn = document.getElementById('requestRoleBtn');
+     if (requestRoleBtn) {
+         requestRoleBtn.addEventListener('click', () => {
+             const role = document.getElementById('requestRoleSelect').value;
+             const reason = document.getElementById('requestRoleReason').value;
+             
+             if (!role || !reason) {
+                 alert('Please provide both role and reason');
+                 return;
+             }
+             
+             requestRole(role, reason);
+             
+             // Clear form
+             document.getElementById('requestRoleSelect').value = '';
+             document.getElementById('requestRoleReason').value = '';
+         });
+     }
+     
+     // Events management event listeners
+     const createEventBtn = document.getElementById('createEventBtn');
+     if (createEventBtn) {
+         createEventBtn.addEventListener('click', function() {
+             const title = document.getElementById('eventTitle').value;
+             const description = document.getElementById('eventDescription').value;
+             const date = document.getElementById('eventDate').value;
+             const time = document.getElementById('eventTime').value;
+             const location = document.getElementById('eventLocation').value;
+             
+             if (!title || !description || !date || !time || !location) {
+                 alert('Please fill in all event fields');
+                 return;
+             }
+             
+             // Get user's character name for organizer
+             const userData = JSON.parse(localStorage.getItem('trimark_user_data') || '{}');
+             const organizer = userData.name || 'Unknown';
+             
+             createEvent(title, description, date, time, location, organizer);
+             
+             // Clear form
+             document.getElementById('eventTitle').value = '';
+             document.getElementById('eventDescription').value = '';
+             document.getElementById('eventDate').value = '';
+             document.getElementById('eventTime').value = '';
+             document.getElementById('eventLocation').value = '';
+         });
+     }
     
     // User search functionality
     const userSearchInput = document.getElementById('userSearchInput');
@@ -296,6 +382,13 @@ function setupEventListeners() {
 function handleNavigation(e) {
     navLinks.forEach(link => link.classList.remove('active'));
     e.target.classList.add('active');
+    
+    // Setup autocomplete when roles section is accessed
+    if (e.target.getAttribute('href') === '#roles') {
+        setTimeout(() => {
+            setupRoleAssignmentAutocomplete();
+        }, 500);
+    }
 }
 
 // Connect wallet function using MetaMask
@@ -503,7 +596,16 @@ async function updateUserProfile() {
                 accessDeniedMessage.remove();
             }
             
-
+            // Show welcome screen for new users
+            if (showWelcomeScreen) {
+                // Get user's role
+                const userRoleEntry = Object.entries(userRoles).find(([characterName, roleData]) => 
+                    roleData.memberAddress && roleData.memberAddress.toLowerCase() === currentAccount.toLowerCase()
+                );
+                const userRole = userRoleEntry ? ROLE_TYPES[userRoleEntry[1].role] : null;
+                
+                showWelcomeScreen(userData.name, userData.portraitUrl || 'https://artifacts.evefrontier.com/portraits/PortraitAwakened256.png', userRole);
+            }
             
             // Add success animation
             userProfile.style.animation = 'fadeIn 0.5s ease-in';
@@ -642,8 +744,7 @@ function disconnectWallet() {
     connectWalletBtn.disabled = false;
     connectWalletBtn.textContent = 'Connect Wallet';
     
-    // Hide admin button
-    hideAdminButton();
+
     
     // Remove access denied message if it exists
     const accessDeniedMessage = document.getElementById('accessDeniedMessage');
@@ -842,8 +943,7 @@ function checkAdminStatus() {
     // Check if user is admin or approved first (these users should always see admin panel)
     if (currentAccount && (ADMIN_WALLETS.includes(currentAccount.toLowerCase()) || approvedUsers.includes(currentAccount.toLowerCase()))) {
         isAdmin = true;
-        showAdminButton();
-        console.log('✅ User is admin or approved - showing admin panel');
+        console.log('✅ User is admin or approved');
         return;
     }
     
@@ -851,30 +951,16 @@ function checkAdminStatus() {
     const userData = JSON.parse(localStorage.getItem('trimark_user_data') || '{}');
     if (!hasRequiredTribeAccess(userData)) {
         isAdmin = false;
-        hideAdminButton();
         console.log('❌ User does not have tribe access');
         return;
     }
     
     // User has tribe access but is not admin/approved
     isAdmin = false;
-    hideAdminButton();
     console.log('❌ User has tribe access but is not admin or approved');
 }
 
-function showAdminButton() {
-    const adminBtn = document.getElementById('adminPanelBtn');
-    if (adminBtn) {
-        adminBtn.style.display = 'flex';
-    }
-}
 
-function hideAdminButton() {
-    const adminBtn = document.getElementById('adminPanelBtn');
-    if (adminBtn) {
-        adminBtn.style.display = 'none';
-    }
-}
 
 function openAdminPanel() {
     const modal = document.getElementById('adminPanelModal');
@@ -1286,8 +1372,35 @@ function closeAddAdminModal() {
 }
 
 // Content Editing Functions
+let isContentEditingEnabled = false;
+
+function toggleContentEditing() {
+    if (!isAdmin) {
+        alert('Only admins can edit content');
+        return;
+    }
+    
+    if (isContentEditingEnabled) {
+        disableContentEditing();
+        const editBtn = document.getElementById('editContentBtn');
+        if (editBtn) {
+            editBtn.textContent = '✏️ Edit Content';
+            editBtn.style.background = 'linear-gradient(135deg, #ff6b6b, #ff4757)';
+        }
+    } else {
+        enableContentEditing();
+        const editBtn = document.getElementById('editContentBtn');
+        if (editBtn) {
+            editBtn.textContent = '❌ Stop Editing';
+            editBtn.style.background = 'linear-gradient(135deg, #ff4444, #cc3333)';
+        }
+    }
+}
+
 function enableContentEditing() {
     if (!isAdmin) return;
+    
+    isContentEditingEnabled = true;
     
     // Add edit buttons to all editable content
     addEditButtons();
@@ -1313,7 +1426,7 @@ function addEditButtons() {
     removeEditButtons();
     
     // Add edit buttons to main content sections
-    const editableSections = document.querySelectorAll('.hero-title, .hero-subtitle, .about-card h3, .about-card p, .service-item h3, .service-item p, .contact-form h3, .contact-form p');
+    const editableSections = document.querySelectorAll('.hero-title, .hero-description, .about-card h3, .about-card p, .service-item h3, .service-item p, .contact-info h3, .contact-info p, .contact-form h3, .contact-form p');
     
     editableSections.forEach(section => {
         if (!section.querySelector('.edit-btn')) {
@@ -1336,7 +1449,7 @@ function removeEditButtons() {
 }
 
 function makeContentEditable() {
-    const editableSections = document.querySelectorAll('.hero-title, .hero-subtitle, .about-card h3, .about-card p, .service-item h3, .service-item p, .contact-form h3, .contact-form p');
+    const editableSections = document.querySelectorAll('.hero-title, .hero-description, .about-card h3, .about-card p, .service-item h3, .service-item p, .contact-info h3, .contact-info p, .contact-form h3, .contact-form p');
     
     editableSections.forEach(section => {
         section.contentEditable = true;
@@ -1434,6 +1547,587 @@ function loadStoredContent() {
     });
 }
 
+// Role Management System
+const ROLE_TYPES = {
+    administrator: { name: 'Administrator', icon: '👑', permissions: ['all'] },
+    diplomatic_officer: { name: 'Diplomatic Officer', icon: '🤝', permissions: ['diplomacy', 'negotiations', 'external_relations'] },
+    lead_tactician: { name: 'Lead Tactician', icon: '⚔️', permissions: ['tactics', 'strategy', 'combat_operations'] },
+    field_survey_lead: { name: 'Field Survey Lead', icon: '🔍', permissions: ['exploration', 'survey', 'resource_assessment'] },
+    recruiter: { name: 'Recruiter', icon: '📢', permissions: ['recruitment', 'outreach', 'member_acquisition'] },
+    ambassador: { name: 'Ambassador', icon: '🌐', permissions: ['representation', 'public_relations', 'community'] },
+    crew_member: { name: 'Crew Member', icon: '👥', permissions: ['operations', 'basic_combat', 'support'] },
+    event_coordinator: { name: 'Event Coordinator', icon: '📅', permissions: ['events', 'scheduling', 'coordination'] }
+};
+
+let userRoles = {};
+let pendingRoleRequests = [];
+let tribeMembers = []; // Store tribe members data
+let events = []; // Store events data
+let showWelcomeScreen = true; // Control welcome screen display
+
+// Initialize role management
+function initializeRoleManagement() {
+    loadUserRoles();
+    loadPendingRoleRequests();
+    renderCurrentRoles();
+    renderPendingApprovals();
+    
+    // Load tribe members data
+    loadTribeMembers();
+    
+    // Setup autocomplete for role assignment
+    setupRoleAssignmentAutocomplete();
+}
+
+// Load user roles from localStorage
+function loadUserRoles() {
+    const storedRoles = localStorage.getItem('trimark_user_roles');
+    if (storedRoles) {
+        userRoles = JSON.parse(storedRoles);
+    }
+}
+
+// Save user roles to localStorage
+function saveUserRoles() {
+    localStorage.setItem('trimark_user_roles', JSON.stringify(userRoles));
+}
+
+// Load pending role requests
+function loadPendingRoleRequests() {
+    const storedRequests = localStorage.getItem('trimark_pending_roles');
+    if (storedRequests) {
+        pendingRoleRequests = JSON.parse(storedRequests);
+    }
+}
+
+// Save pending role requests
+function savePendingRoleRequests() {
+    localStorage.setItem('trimark_pending_roles', JSON.stringify(pendingRoleRequests));
+}
+
+   // Assign role to user
+  function assignRoleToUser(characterName, role, reason) {
+      if (!isAdmin) {
+          alert('Only administrators can assign roles');
+          return;
+      }
+      
+      if (!characterName || !role) {
+          alert('Please provide both character name and role');
+          return;
+      }
+      
+      const cleanCharacterName = characterName.trim();
+      
+      // Check if character is a valid tribe member
+      const tribeMember = tribeMembers.find(member => 
+          member.name.toLowerCase() === cleanCharacterName.toLowerCase()
+      );
+      
+      if (!tribeMember) {
+          alert('This character is not a member of Trimark Industries. Only tribe members can be assigned roles.');
+          return;
+      }
+      
+      // Check if character name already has a role
+      if (userRoles[cleanCharacterName]) {
+          alert('This character already has a role assigned');
+          return;
+      }
+      
+      // Assign role
+      userRoles[cleanCharacterName] = {
+          role: role,
+          assignedBy: currentAccount,
+          assignedAt: Date.now(),
+          reason: reason || 'No reason provided',
+          memberAddress: tribeMember.address // Store the member's address for reference
+      };
+      
+      saveUserRoles();
+      logAdminActivity(`Role Assigned: ${ROLE_TYPES[role].name}`, cleanCharacterName);
+      
+      // Update UI
+      renderCurrentRoles();
+      
+      alert(`Role ${ROLE_TYPES[role].name} assigned successfully to ${cleanCharacterName}`);
+      
+      // Clear form
+      document.getElementById('roleUserName').value = '';
+      document.getElementById('roleSelect').value = '';
+      document.getElementById('roleReason').value = '';
+  }
+
+ // Remove role from user
+ function removeRoleFromUser(characterName) {
+     if (!isAdmin) {
+         alert('Only administrators can remove roles');
+         return;
+     }
+     
+     if (confirm(`Are you sure you want to remove the role from ${characterName}?`)) {
+         delete userRoles[characterName];
+         saveUserRoles();
+         logAdminActivity('Role Removed', characterName);
+         renderCurrentRoles();
+         alert('Role removed successfully');
+     }
+ }
+
+// Request role (for non-admins)
+function requestRole(role, reason) {
+    if (!currentAccount) {
+        alert('Please connect your wallet first');
+        return;
+    }
+    
+    const request = {
+        address: currentAccount,
+        role: role,
+        reason: reason,
+        requestedAt: Date.now(),
+        status: 'pending'
+    };
+    
+    pendingRoleRequests.push(request);
+    savePendingRoleRequests();
+    renderPendingApprovals();
+    
+    alert('Role request submitted successfully. An administrator will review it.');
+}
+
+// Approve role request
+function approveRoleRequest(requestIndex) {
+    if (!isAdmin) {
+        alert('Only administrators can approve role requests');
+        return;
+    }
+    
+    const request = pendingRoleRequests[requestIndex];
+    
+    // Assign the role
+    userRoles[request.address] = {
+        role: request.role,
+        assignedBy: currentAccount,
+        assignedAt: Date.now(),
+        reason: request.reason,
+        approvedFromRequest: true
+    };
+    
+    saveUserRoles();
+    
+    // Remove from pending requests
+    pendingRoleRequests.splice(requestIndex, 1);
+    savePendingRoleRequests();
+    
+    logAdminActivity(`Role Request Approved: ${ROLE_TYPES[request.role].name}`, request.address);
+    
+    // Update UI
+    renderCurrentRoles();
+    renderPendingApprovals();
+    
+    alert('Role request approved successfully');
+}
+
+// Reject role request
+function rejectRoleRequest(requestIndex) {
+    if (!isAdmin) {
+        alert('Only administrators can reject role requests');
+        return;
+    }
+    
+    const request = pendingRoleRequests[requestIndex];
+    
+    // Remove from pending requests
+    pendingRoleRequests.splice(requestIndex, 1);
+    savePendingRoleRequests();
+    
+    logAdminActivity(`Role Request Rejected: ${ROLE_TYPES[request.role].name}`, request.address);
+    
+    // Update UI
+    renderPendingApprovals();
+    
+    alert('Role request rejected');
+}
+
+ // Render current roles
+ function renderCurrentRoles() {
+     const rolesList = document.getElementById('currentRolesList');
+     if (!rolesList) return;
+     
+     const roleEntries = Object.entries(userRoles);
+     
+     if (roleEntries.length === 0) {
+         rolesList.innerHTML = '<p class="no-roles">No roles assigned yet</p>';
+         return;
+     }
+     
+     rolesList.innerHTML = roleEntries.map(([characterName, roleData]) => {
+         const roleInfo = ROLE_TYPES[roleData.role];
+         
+         return `
+             <div class="role-item">
+                 <div class="role-item-info">
+                     <div class="role-item-address">${characterName}</div>
+                     <div class="role-item-role">${roleInfo.icon} ${roleInfo.name}</div>
+                     <div class="role-item-reason">Reason: ${roleData.reason}</div>
+                 </div>
+                 <div class="role-item-actions">
+                     ${isAdmin ? `
+                         <button class="role-action-btn remove" onclick="removeRoleFromUser('${characterName}')" title="Remove Role">
+                             Remove
+                         </button>
+                     ` : ''}
+                 </div>
+             </div>
+         `;
+     }).join('');
+ }
+
+// Render pending approvals
+function renderPendingApprovals() {
+    const approvalsList = document.getElementById('pendingApprovalsList');
+    if (!approvalsList) return;
+    
+    if (pendingRoleRequests.length === 0) {
+        approvalsList.innerHTML = '<p class="no-approvals">No pending role requests</p>';
+        return;
+    }
+    
+    approvalsList.innerHTML = pendingRoleRequests.map((request, index) => {
+        const roleInfo = ROLE_TYPES[request.role];
+        
+        return `
+            <div class="role-item">
+                <div class="role-item-info">
+                    <div class="role-item-address">${request.address}</div>
+                    <div class="role-item-role">${roleInfo.icon} ${roleInfo.name}</div>
+                    <div class="role-item-reason">Reason: ${request.reason}</div>
+                </div>
+                <div class="role-item-actions">
+                    ${isAdmin ? `
+                        <button class="role-action-btn approve" onclick="approveRoleRequest(${index})" title="Approve Request">
+                            Approve
+                        </button>
+                        <button class="role-action-btn reject" onclick="rejectRoleRequest(${index})" title="Reject Request">
+                            Reject
+                        </button>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// Check if user has specific permission
+function hasPermission(permission) {
+    if (!currentAccount) return false;
+    
+    const userRole = userRoles[currentAccount.toLowerCase()];
+    if (!userRole) return false;
+    
+    const roleInfo = ROLE_TYPES[userRole.role];
+    return roleInfo.permissions.includes('all') || roleInfo.permissions.includes(permission);
+}
+
+   // Get user's role
+  function getUserRole(characterName) {
+      if (!characterName) return null;
+      return userRoles[characterName] || null;
+  }
+
+  // Load tribe members from API
+  async function loadTribeMembers() {
+      try {
+          const response = await fetch(`${EVE_FRONTIER_API_BASE}/tribes/${REQUIRED_TRIBE_ID}?format=json`, {
+              method: 'GET',
+              headers: {
+                  'accept': 'application/json',
+                  'Content-Type': 'application/json'
+              }
+          });
+          
+          if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          
+          const data = await response.json();
+          tribeMembers = data.members || [];
+          console.log(`Loaded ${tribeMembers.length} tribe members from Trimark Industries`);
+          
+          // Update tribe member count display if it exists
+          const memberCountDisplay = document.getElementById('tribeMemberCount');
+          if (memberCountDisplay) {
+              memberCountDisplay.textContent = tribeMembers.length;
+          }
+          
+      } catch (error) {
+          console.error('Error loading tribe members:', error);
+          tribeMembers = [];
+      }
+  }
+
+  // Refresh tribe members data
+  async function refreshTribeMembers() {
+      await loadTribeMembers();
+      // Re-setup autocomplete with fresh data
+      setupRoleAssignmentAutocomplete();
+      alert(`Refreshed tribe member data. Current member count: ${tribeMembers.length}`);
+  }
+
+    // Setup autocomplete for role assignment
+  function setupRoleAssignmentAutocomplete() {
+      const roleUserNameInput = document.getElementById('roleUserName');
+      if (!roleUserNameInput) {
+          console.log('Role username input not found, retrying in 1 second...');
+          setTimeout(setupRoleAssignmentAutocomplete, 1000);
+          return;
+      }
+      
+      console.log('Setting up autocomplete for role assignment...');
+      
+      // Remove existing autocomplete container if it exists
+      const existingContainer = roleUserNameInput.parentNode.querySelector('.autocomplete-container');
+      if (existingContainer) {
+          existingContainer.remove();
+      }
+      
+      // Create autocomplete container
+      let autocompleteContainer = document.createElement('div');
+      autocompleteContainer.className = 'autocomplete-container';
+      autocompleteContainer.style.display = 'none';
+      roleUserNameInput.parentNode.appendChild(autocompleteContainer);
+      
+      // Remove existing event listeners to prevent duplicates
+      const newInput = roleUserNameInput.cloneNode(true);
+      roleUserNameInput.parentNode.replaceChild(newInput, roleUserNameInput);
+      
+      newInput.addEventListener('input', function() {
+          const inputValue = this.value.toLowerCase().trim();
+          console.log('Input value:', inputValue, 'Tribe members count:', tribeMembers.length);
+          
+          if (inputValue.length < 2) {
+              autocompleteContainer.style.display = 'none';
+              return;
+          }
+          
+          // Filter tribe members that match the input
+          const matches = tribeMembers.filter(member => 
+              member.name.toLowerCase().includes(inputValue) &&
+              !userRoles[member.name] // Don't show members who already have roles
+          ).slice(0, 5); // Limit to 5 suggestions
+          
+          console.log('Matches found:', matches.length);
+          
+          if (matches.length > 0) {
+              autocompleteContainer.innerHTML = matches.map(member => 
+                  `<div class="autocomplete-item" data-name="${member.name}">
+                      <span class="member-name">${member.name}</span>
+                      <span class="member-address">${member.address.slice(0, 6)}...${member.address.slice(-4)}</span>
+                  </div>`
+              ).join('');
+              
+              autocompleteContainer.style.display = 'block';
+              
+              // Add click handlers to suggestions
+              autocompleteContainer.querySelectorAll('.autocomplete-item').forEach(item => {
+                  item.addEventListener('click', function() {
+                      const selectedName = this.getAttribute('data-name');
+                      newInput.value = selectedName;
+                      autocompleteContainer.style.display = 'none';
+                  });
+                });
+            } else {
+                autocompleteContainer.style.display = 'none';
+            }
+        });
+        
+        // Hide autocomplete when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!newInput.contains(e.target) && !autocompleteContainer.contains(e.target)) {
+                autocompleteContainer.style.display = 'none';
+            }
+        });
+        
+        // Hide autocomplete on focus out
+        newInput.addEventListener('blur', function() {
+            setTimeout(() => {
+                autocompleteContainer.style.display = 'none';
+            }, 200);
+        });
+        
+        console.log('Autocomplete setup complete');
+    }
+
+// Events Management System
+function initializeEvents() {
+    loadEvents();
+    renderEvents();
+}
+
+function loadEvents() {
+    const storedEvents = localStorage.getItem('trimark_events');
+    if (storedEvents) {
+        events = JSON.parse(storedEvents);
+    }
+}
+
+function saveEvents() {
+    localStorage.setItem('trimark_events', JSON.stringify(events));
+}
+
+function createEvent(title, description, date, time, location, organizer) {
+    if (!hasPermission('events')) {
+        alert('Only Event Coordinators can create events');
+        return;
+    }
+    
+    const newEvent = {
+        id: Date.now().toString(),
+        title: title,
+        description: description,
+        date: date,
+        time: time,
+        location: location,
+        organizer: organizer,
+        createdAt: Date.now(),
+        attendees: []
+    };
+    
+    events.push(newEvent);
+    saveEvents();
+    renderEvents();
+    
+    logAdminActivity('Event Created', title);
+    alert('Event created successfully!');
+}
+
+function deleteEvent(eventId) {
+    if (!hasPermission('events')) {
+        alert('Only Event Coordinators can delete events');
+        return;
+    }
+    
+    if (confirm('Are you sure you want to delete this event?')) {
+        const eventIndex = events.findIndex(e => e.id === eventId);
+        if (eventIndex !== -1) {
+            const eventTitle = events[eventIndex].title;
+            events.splice(eventIndex, 1);
+            saveEvents();
+            renderEvents();
+            
+            logAdminActivity('Event Deleted', eventTitle);
+            alert('Event deleted successfully!');
+        }
+    }
+}
+
+function renderEvents() {
+    const eventsContainer = document.getElementById('eventsList');
+    if (!eventsContainer) return;
+    
+    if (events.length === 0) {
+        eventsContainer.innerHTML = '<p class="no-events">No events scheduled</p>';
+        return;
+    }
+    
+    eventsContainer.innerHTML = events.map(event => {
+        const canManage = hasPermission('events');
+        const isAttending = event.attendees.includes(currentAccount);
+        
+        return `
+            <div class="event-item">
+                <div class="event-header">
+                    <h3 class="event-title">${event.title}</h3>
+                    ${canManage ? `<button class="event-delete-btn" onclick="deleteEvent('${event.id}')">🗑️</button>` : ''}
+                </div>
+                <div class="event-details">
+                    <p class="event-description">${event.description}</p>
+                    <div class="event-meta">
+                        <span class="event-date">📅 ${event.date}</span>
+                        <span class="event-time">🕐 ${event.time}</span>
+                        <span class="event-location">📍 ${event.location}</span>
+                        <span class="event-organizer">👤 ${event.organizer}</span>
+                    </div>
+                    <div class="event-attendees">
+                        <span class="attendee-count">👥 ${event.attendees.length} attending</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// Welcome Screen System
+function showWelcomeScreen(userName, userPortrait, userRole) {
+    if (!showWelcomeScreen) return;
+    
+    // Create welcome screen modal
+    const welcomeModal = document.createElement('div');
+    welcomeModal.className = 'welcome-modal';
+    welcomeModal.innerHTML = `
+        <div class="welcome-content">
+            <div class="welcome-header">
+                <h2>Welcome to Trimark Industries</h2>
+                <button class="welcome-close-btn" onclick="closeWelcomeScreen()">×</button>
+            </div>
+            <div class="welcome-body">
+                <div class="welcome-user-info">
+                    <img src="${userPortrait}" alt="Character Portrait" class="welcome-portrait">
+                    <div class="welcome-user-details">
+                        <h3 class="welcome-user-name">${userName}</h3>
+                        <div class="welcome-user-role">
+                            ${userRole ? `${userRole.icon} ${userRole.name}` : '👤 No Role Assigned'}
+                        </div>
+                    </div>
+                </div>
+                <div class="welcome-message">
+                    <p>Welcome back, Commander! You have successfully accessed the Trimark Industries portal.</p>
+                    <p>Your role: <strong>${userRole ? userRole.name : 'No Role Assigned'}</strong></p>
+                    <p>Click anywhere outside this message to continue to the site.</p>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(welcomeModal);
+    
+    // Add click outside to close functionality
+    welcomeModal.addEventListener('click', function(e) {
+        if (e.target === welcomeModal) {
+            closeWelcomeScreen();
+        }
+    });
+}
+
+function closeWelcomeScreen() {
+    const welcomeModal = document.querySelector('.welcome-modal');
+    if (welcomeModal) {
+        welcomeModal.remove();
+        showWelcomeScreen = false;
+        localStorage.setItem('trimark_welcome_shown', 'true');
+    }
+}
+
+// Check if user has permission for specific actions
+function hasPermission(action) {
+    if (!currentAccount) return false;
+    
+    // Find user's role by wallet address
+    const userRoleEntry = Object.entries(userRoles).find(([characterName, roleData]) => 
+        roleData.memberAddress && roleData.memberAddress.toLowerCase() === currentAccount.toLowerCase()
+    );
+    
+    if (!userRoleEntry) return false;
+    
+    const userRole = userRoleEntry[1].role;
+    const roleInfo = ROLE_TYPES[userRole];
+    
+    if (!roleInfo) return false;
+    
+    return roleInfo.permissions.includes('all') || roleInfo.permissions.includes(action);
+}
+
 // Export functions for potential external use
 window.TrimarkApp = {
     connectWallet,
@@ -1444,5 +2138,13 @@ window.TrimarkApp = {
     isUserApproved,
     isAdmin,
     enableContentEditing,
-    disableContentEditing
+    disableContentEditing,
+    assignRoleToUser,
+    removeRoleFromUser,
+    requestRole,
+    hasPermission,
+    getUserRole,
+    createEvent,
+    deleteEvent,
+    renderEvents
 };
