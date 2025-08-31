@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About - Member Resources</title>
+    <title>Manufacturing Status - Trimark Industries</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js" type="application/javascript" onerror="loadEthersFallback()"></script>
@@ -37,8 +37,8 @@
             
             <nav class="nav">
                 <a href="index.html" class="nav-link">Home</a>
-                <a href="about.html" class="nav-link active">About</a>
-                <a href="ore-sites.html" class="nav-link">Ore Sites</a>
+                <a href="about.html" class="nav-link">About</a>
+                <a href="services.html" class="nav-link">Services</a>
                 <a href="roles.html" class="nav-link">Roles</a>
                 <a href="members.html" class="nav-link">Members</a>
                 <a href="events.html" class="nav-link">Events</a>
@@ -138,31 +138,108 @@
             </div>
         </div>
 
+        <!-- Add Production Order Modal -->
+        <div id="addProductionOrderModal" class="admin-modal hidden">
+            <div class="admin-modal-content">
+                <div class="admin-modal-header">
+                    <h2>🏭 Add Production Order</h2>
+                    <button id="closeProductionModal" class="close-btn">×</button>
+                </div>
+                <div class="admin-modal-body">
+                    <div class="admin-section">
+                        <form id="productionOrderForm">
+                            <div class="form-group">
+                                <label for="itemName">Item Name:</label>
+                                <input type="text" id="itemName" required class="admin-input">
+                            </div>
+                            <div class="form-group">
+                                <label for="quantity">Quantity:</label>
+                                <input type="number" id="quantity" required class="admin-input" min="1">
+                            </div>
+                            <div class="form-group">
+                                <label for="facility">Facility:</label>
+                                <select id="facility" required class="admin-input">
+                                    <option value="">Select Facility</option>
+                                    <option value="Station 1 - Assembly Line A">Station 1 - Assembly Line A</option>
+                                    <option value="Station 1 - Assembly Line B">Station 1 - Assembly Line B</option>
+                                    <option value="Station 2 - Component Fab">Station 2 - Component Fab</option>
+                                    <option value="Station 1 - Refinery">Station 1 - Refinery</option>
+                                    <option value="Station 3 - Advanced Manufacturing">Station 3 - Advanced Manufacturing</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="priority">Priority:</label>
+                                <select id="priority" required class="admin-input">
+                                    <option value="low">Low</option>
+                                    <option value="normal" selected>Normal</option>
+                                    <option value="high">High</option>
+                                    <option value="urgent">Urgent</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="notes">Notes:</label>
+                                <textarea id="notes" class="admin-input" rows="3" placeholder="Any special requirements or notes..."></textarea>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="admin-btn">Add Order</button>
+                                <button type="button" id="cancelProduction" class="admin-btn secondary">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <main class="main-content">
-            <section id="about" class="about-section">
-                <h2 class="section-title">Member Resources</h2>
-                <div class="about-grid">
-                    <div class="about-card">
-                        <div class="card-icon">📊</div>
-                        <h3>Operations Dashboard</h3>
-                        <p>Monitor current mining operations, manufacturing queues, and logistics status across all our active star systems.</p>
+            <section id="manufacturing" class="manufacturing-section">
+                <div class="manufacturing-header">
+                    <h2 class="section-title">Manufacturing Status</h2>
+                    <p class="section-subtitle">Production queue updates, blueprint efficiency ratings, and quality control reports from our industrial facilities.</p>
+                    <button id="addProductionOrder" class="cta-btn">🏭 Add Production Order</button>
+                </div>
+                
+                <div class="manufacturing-content">
+                    <div class="manufacturing-filters">
+                        <input type="text" id="manufacturingSearch" placeholder="Search production orders..." class="manufacturing-search-input">
+                        <select id="manufacturingFilter" class="manufacturing-filter-select">
+                            <option value="all">All Orders</option>
+                            <option value="active">Active Only</option>
+                            <option value="completed">Completed</option>
+                            <option value="pending">Pending</option>
+                        </select>
+                        <select id="manufacturingSort" class="manufacturing-sort-select">
+                            <option value="priority">Sort by Priority</option>
+                            <option value="progress">Sort by Progress</option>
+                            <option value="completion">Sort by Completion</option>
+                            <option value="facility">Sort by Facility</option>
+                        </select>
                     </div>
-                    <div class="about-card">
-                        <div class="card-icon">📋</div>
-                        <h3>Mission Board</h3>
-                        <p>View available assignments, track your contributions, and coordinate with other members on strategic operations.</p>
+                    
+                    <div class="manufacturing-stats">
+                        <div class="stat-card">
+                            <span class="stat-number" id="totalOrders">0</span>
+                            <span class="stat-label">Total Orders</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-number" id="activeOrders">0</span>
+                            <span class="stat-label">Active Orders</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-number" id="avgEfficiency">0%</span>
+                            <span class="stat-label">Avg Efficiency</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-number" id="facilityUtilization">0%</span>
+                            <span class="stat-label">Facility Utilization</span>
+                        </div>
                     </div>
-                    <div class="about-card">
-                        <div class="card-icon">💼</div>
-                        <h3>Corporation Tools</h3>
-                        <p>Access specialized equipment, blueprints, and resources needed for your role within Trimark Industries.</p>
+                    
+                    <div id="manufacturingList" class="manufacturing-list">
+                        <!-- Manufacturing orders will be populated here -->
                     </div>
                 </div>
             </section>
         </main>
-
-        <!-- Hidden Canvas Element for The Architect's Signature -->
-        <canvas id="hiddenCanvas" width="100" height="100" style="display: none; position: absolute; left: -9999px; top: -9999px; width: 0; height: 0;"></canvas>
 
         <footer class="footer">
             <div class="footer-content">
@@ -170,36 +247,18 @@
                     <h4>Quick Links</h4>
                     <a href="index.html">Home</a>
                     <a href="about.html">About</a>
-                    <a href="ore-sites.html">Ore Sites</a>
+                    <a href="services.html">Services</a>
                     <a href="roles.html">Roles</a>
                     <a href="members.html">Members</a>
                     <a href="events.html">Events</a>
                 </div>
-
+                <div class="footer-section">
+                    <h4>Connect</h4>
+                    <p>Stay connected with fellow members</p>
+                </div>
             </div>
             <div class="footer-bottom">
                 <p>&copy; 2024. All rights reserved.</p>
-            </div>
-            
-            <!-- The Architect's Signature - Hidden in footer -->
-            <div class="architect-signature">
-                <svg class="h-48 w-48 animate-pulse-slow" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <!-- The central, perfect triangle representing the unified universe -->
-                    <path d="M50 5 L95 95 H5 L50 5 Z" stroke="#00F8FF" stroke-width="2" />
-                    
-                    <!-- Fragmentation lines, symbolizing the shattering of reality -->
-                    <line x1="50" y1="5" x2="50" y2="30" stroke="#00F8FF" stroke-width="1.5" />
-                    <line x1="50" y1="50" x2="50" y2="70" stroke="#00F8FF" stroke-width="1.5" />
-
-                    <line x1="5" y1="95" x2="30" y2="95" stroke="#00F8FF" stroke-width="1.5" />
-                    <line x1="70" y1="95" x2="95" y2="95" stroke="#00F8FF" stroke-width="1.5" />
-
-                    <line x1="50" y1="50" x2="75" y2="75" stroke="#00F8FF" stroke-width="1.5" />
-                    <line x1="50" y1="50" x2="25" y2="75" stroke="#00F8FF" stroke-width="1.5" />
-                    
-                    <!-- Central point of purpose or "eye" of the Architect -->
-                    <circle cx="50" cy="50" r="4" fill="#00F8FF" />
-                </svg>
             </div>
         </footer>
     </div>

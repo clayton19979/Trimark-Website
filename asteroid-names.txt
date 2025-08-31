@@ -1,0 +1,18 @@
+Old Crude Matter
+Common Ore
+Metal-rich Ore
+Carbonaceous Ore
+Deep-Core Metallic Ore
+Deep-Core Carbon Ore
+Young Crude Matter
+Adaptive Core Aestasium
+Agile Core Aestasium
+Solidifying Core Aestasium
+Hardened Core Aestasium
+Fluid Core Hermetite
+Crystallizing Core Hermetite
+Stale Core Hermetite
+Sediment Core Hermetite
+Rich Common Ore
+Unrefined Radiantium
+Defiled Crude Matter

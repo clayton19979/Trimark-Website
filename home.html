@@ -38,8 +38,9 @@
             <nav class="nav">
                 <a href="home.html" class="nav-link active">Home</a>
                 <a href="about.html" class="nav-link">About</a>
-                <a href="services.html" class="nav-link">Services</a>
+                <a href="ore-sites.html" class="nav-link">Ore Sites</a>
                 <a href="roles.html" class="nav-link">Roles</a>
+                <a href="members.html" class="nav-link">Members</a>
                 <a href="events.html" class="nav-link">Events</a>
             </nav>
 
@@ -148,7 +149,7 @@
                     </p>
                     <div class="hero-buttons">
                         <a href="about.html" class="cta-btn primary">Member Resources</a>
-                        <a href="services.html" class="cta-btn secondary">Active Operations</a>
+                        <a href="ore-sites.html" class="cta-btn secondary">Ore Sites</a>
                     </div>
                 </div>
                 
@@ -162,23 +163,45 @@
             </section>
         </main>
 
+        <!-- Hidden Canvas Element for The Architect's Signature -->
+        <canvas id="hiddenCanvas" width="100" height="100" style="display: none; position: absolute; left: -9999px; top: -9999px; width: 0; height: 0;"></canvas>
+
         <footer class="footer">
             <div class="footer-content">
                 <div class="footer-section">
                     <h4>Quick Links</h4>
                     <a href="home.html">Home</a>
                     <a href="about.html">About</a>
-                    <a href="services.html">Services</a>
+                    <a href="ore-sites.html">Ore Sites</a>
                     <a href="roles.html">Roles</a>
+                    <a href="members.html">Members</a>
                     <a href="events.html">Events</a>
                 </div>
-                <div class="footer-section">
-                    <h4>Connect</h4>
-                    <p>Stay connected with fellow members</p>
-                </div>
+
             </div>
             <div class="footer-bottom">
                 <p>&copy; 2024. All rights reserved.</p>
+            </div>
+            
+            <!-- The Architect's Signature - Hidden in footer -->
+            <div class="architect-signature">
+                <svg class="h-48 w-48 animate-pulse-slow" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- The central, perfect triangle representing the unified universe -->
+                    <path d="M50 5 L95 95 H5 L50 5 Z" stroke="#00F8FF" stroke-width="2" />
+                    
+                    <!-- Fragmentation lines, symbolizing the shattering of reality -->
+                    <line x1="50" y1="5" x2="50" y2="30" stroke="#00F8FF" stroke-width="1.5" />
+                    <line x1="50" y1="50" x2="50" y2="70" stroke="#00F8FF" stroke-width="1.5" />
+
+                    <line x1="5" y1="95" x2="30" y2="95" stroke="#00F8FF" stroke-width="1.5" />
+                    <line x1="70" y1="95" x2="95" y2="95" stroke="#00F8FF" stroke-width="1.5" />
+
+                    <line x1="50" y1="50" x2="75" y2="75" stroke="#00F8FF" stroke-width="1.5" />
+                    <line x1="50" y1="50" x2="25" y2="75" stroke="#00F8FF" stroke-width="1.5" />
+                    
+                    <!-- Central point of purpose or "eye" of the Architect -->
+                    <circle cx="50" cy="50" r="4" fill="#00F8FF" />
+                </svg>
             </div>
         </footer>
     </div>

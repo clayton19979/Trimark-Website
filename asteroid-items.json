@@ -1,0 +1,146 @@
+[
+  {
+    "id": 77729,
+    "name": "Old Crude Matter",
+    "groupName": "Rift",
+    "mass": 1100,
+    "volume": 1,
+    "portionSize": 10000
+  },
+  {
+    "id": 77800,
+    "name": "Common Ore",
+    "groupName": "Common Ore",
+    "mass": 2850,
+    "volume": 1,
+    "portionSize": 10000
+  },
+  {
+    "id": 77810,
+    "name": "Metal-rich Ore",
+    "groupName": "Metal Ore",
+    "mass": 6925,
+    "volume": 1,
+    "portionSize": 10000
+  },
+  {
+    "id": 77811,
+    "name": "Carbonaceous Ore",
+    "groupName": "Carbonaceous Ore ",
+    "mass": 1550,
+    "volume": 1,
+    "portionSize": 10000
+  },
+  {
+    "id": 78426,
+    "name": "Deep-Core Metallic Ore",
+    "groupName": "Deep-Core Metallic Asteroid",
+    "mass": 8200,
+    "volume": 1,
+    "portionSize": 10000
+  },
+  {
+    "id": 78429,
+    "name": "Deep-Core Carbon Ore",
+    "groupName": "Deep-Core Carbon Asteroid",
+    "mass": 2000,
+    "volume": 1,
+    "portionSize": 10000
+  },
+  {
+    "id": 78434,
+    "name": "Young Crude Matter",
+    "groupName": "Rift",
+    "mass": 812,
+    "volume": 1,
+    "portionSize": 10000
+  },
+  {
+    "id": 78446,
+    "name": "Adaptive Core Aestasium",
+    "groupName": "Synthetic Aestasium",
+    "mass": 1500,
+    "volume": 1,
+    "portionSize": 10000
+  },
+  {
+    "id": 78447,
+    "name": "Agile Core Aestasium",
+    "groupName": "Natural Resources",
+    "mass": 2000,
+    "volume": 1,
+    "portionSize": 10000
+  },
+  {
+    "id": 78448,
+    "name": "Solidifying Core Aestasium",
+    "groupName": "Natural Resources",
+    "mass": 3500,
+    "volume": 1,
+    "portionSize": 10000
+  },
+  {
+    "id": 78449,
+    "name": "Hardened Core Aestasium",
+    "groupName": "Natural Resources",
+    "mass": 3000,
+    "volume": 1,
+    "portionSize": 10000
+  },
+  {
+    "id": 78450,
+    "name": "Fluid Core Hermetite",
+    "groupName": "Synthetic Hermetite",
+    "mass": 4000,
+    "volume": 1,
+    "portionSize": 10000
+  },
+  {
+    "id": 78451,
+    "name": "Crystallizing Core Hermetite",
+    "groupName": "Synthetic Hermetite",
+    "mass": 4500,
+    "volume": 1,
+    "portionSize": 10000
+  },
+  {
+    "id": 78452,
+    "name": "Stale Core Hermetite",
+    "groupName": "Synthetic Hermetite",
+    "mass": 6000,
+    "volume": 1,
+    "portionSize": 10000
+  },
+  {
+    "id": 78453,
+    "name": "Sediment Core Hermetite",
+    "groupName": "Synthetic Hermetite",
+    "mass": 5500,
+    "volume": 1,
+    "portionSize": 10000
+  },
+  {
+    "id": 87375,
+    "name": "Rich Common Ore",
+    "groupName": "Natural Resources",
+    "mass": 1201,
+    "volume": 1,
+    "portionSize": 10
+  },
+  {
+    "id": 87595,
+    "name": "Unrefined Radiantium",
+    "groupName": "Natural Resources",
+    "mass": 2521.00830078125,
+    "volume": 1,
+    "portionSize": 10
+  },
+  {
+    "id": 89794,
+    "name": "Defiled Crude Matter",
+    "groupName": "Rift",
+    "mass": 20000,
+    "volume": 1,
+    "portionSize": 10000
+  }
+]

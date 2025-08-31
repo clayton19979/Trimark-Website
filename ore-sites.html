@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ore Sites - Trimark Industries</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js" type="application/javascript" onerror="loadEthersFallback()"></script>
+    <script>
+        function loadEthersFallback() {
+            console.log('Primary ethers CDN failed, trying fallback...');
+            const script = document.createElement('script');
+            script.src = 'https://unpkg.com/ethers@5.7.2/dist/ethers.umd.min.js';
+            script.onload = () => console.log('Fallback ethers loaded successfully');
+            script.onerror = () => console.error('All ethers CDNs failed');
+            document.head.appendChild(script);
+        }
+    </script>
+    <script src="https://unpkg.com/@metamask/detect-provider@2.0.0/dist/detect-provider.min.js"></script>
+    <script src="systems-data.js"></script>
+    <script>
+        // OneKey Wallet EIP-6963 Detection
+        let onekeyProvider = null;
+        
+        const onAnnounceProvider = (event) => {
+            // The event.detail contains the provider info and the provider object itself.
+            // event.detail = { info: { uuid, name, icon, rdns }, provider }
+            if (event.detail.info.name === 'OneKey') {
+                onekeyProvider = event.detail.provider;
+                console.log('✅ OneKey wallet detected via EIP-6963!');
+                
+                // Make it available globally
+                window.onekeyProvider = onekeyProvider;
+                
+                // Update button text if available
+                const connectBtn = document.getElementById('connectWallet');
+                if (connectBtn) {
+                    connectBtn.textContent = 'Connect OneKey Wallet';
+                    connectBtn.disabled = false;
+                }
+            }
+            // You can also store all providers in an array to let users choose.
+        };
+        
+        // Listen for the announcement event from all wallets
+        window.addEventListener('eip6963:announceProvider', onAnnounceProvider);
+        
+        // It's also good practice to dispatch a request event to prompt wallets
+        // that may have loaded after the initial page load.
+        window.dispatchEvent(new Event('eip6963:requestProvider'));
+        
+        // After a short delay, check if the onekeyProvider was found.
+        setTimeout(() => {
+            if (onekeyProvider) {
+                console.log('✅ OneKey wallet ready via EIP-6963!');
+                window.onekeyProvider = onekeyProvider;
+                
+                const connectBtn = document.getElementById('connectWallet');
+                if (connectBtn) {
+                    connectBtn.textContent = 'Connect OneKey Wallet';
+                    connectBtn.disabled = false;
+                }
+            } else {
+                console.log('❌ OneKey Wallet not found via EIP-6963. Please install it from onekey.so/download');
+                const connectBtn = document.getElementById('connectWallet');
+                if (connectBtn) {
+                    connectBtn.textContent = 'Install OneKey Wallet';
+                    connectBtn.disabled = false;
+                }
+            }
+        }, 500);
+    </script>
+</head>
+<body>
+    <div class="stars"></div>
+    <div class="twinkling"></div>
+    
+    <div class="container">
+        <header class="header">
+            <div class="logo">
+                <div class="logo-image">
+                    <img src="ChatGPT_Image_Jul_3_2025_08_34_57_PM.png" alt="Trimark Industries Logo" class="corp-logo">
+                </div>
+                <div class="logo-text">
+                    <h1>TRIMARK INDUSTRIES</h1>
+                    <p class="tagline">Forging the Future in EVE Frontier</p>
+                </div>
+            </div>
+            
+            <nav class="nav">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="about.html" class="nav-link">About</a>
+                <a href="ore-sites.html" class="nav-link active">Ore Sites</a>
+                <a href="roles.html" class="nav-link">Roles</a>
+                <a href="events.html" class="nav-link">Events</a>
+                <a href="members.html" class="nav-link">Members</a>
+            </nav>
+
+            <div class="wallet-section">
+                <button id="connectWallet" class="wallet-btn">
+                    <span class="wallet-icon">🔗</span>
+                    Connect Wallet
+                </button>
+
+                <div id="userProfile" class="user-profile hidden">
+                    <img id="userPortrait" src="" alt="Character Portrait" class="user-portrait">
+                    <div class="user-info">
+                        <span id="userName" class="user-name"></span>
+                        <span id="userAddress" class="user-address"></span>
+                    </div>
+                    <button id="disconnectWallet" class="disconnect-btn">×</button>
+                </div>
+            </div>
+        </header>
+
+
+
+    <!-- Report Ore Site Modal -->
+    <div id="reportOreSiteModal" class="admin-modal hidden">
+        <div class="admin-modal-content">
+            <div class="admin-modal-header">
+                <h2>⛏️ Report New Ore Site</h2>
+                <button id="closeReportModal" class="close-btn">×</button>
+            </div>
+            <div class="admin-modal-body">
+                <div class="admin-section">
+                    <form id="oreSiteForm">
+                        <div class="form-group">
+                            <label for="siteName">Site Name:</label>
+                            <input type="text" id="siteName" required class="admin-input">
+                        </div>
+                        <div class="form-group">
+                            <label for="systemName">System:</label>
+                            <input type="text" id="systemName" required class="admin-input" placeholder="Start typing to search systems...">
+                            <div id="systemSearchResults" class="system-search-results hidden"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="oreType">Ore Type:</label>
+                            <select id="oreType" required class="admin-input">
+                                <option value="">Select Ore Type</option>
+                                <option value="Common Ore">Common Ore</option>
+                                <option value="Carbonaceous Ore">Carbonaceous Ore</option>
+                                <option value="Metal Rich Ore">Metal Rich Ore</option>
+                                <option value="Deep-Core Metallic Ore">Deep-Core Metallic Ore</option>
+                                <option value="Deep-Core Carbon Ore">Deep-Core Carbon Ore</option>
+                                <option value="Core Aestasium">Core Aestasium</option>
+                                <option value="Core Hermetite">Core Hermetite</option>
+                                <option value="Crude Matter">Crude Matter</option>
+                                <option value="Special Materials">Special Materials</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="estimatedYield">Estimated Yield (m³/hr):</label>
+                            <input type="number" id="estimatedYield" required class="admin-input">
+                        </div>
+                        <div class="form-group">
+                            <label for="securityStatus">Security Status:</label>
+                            <select id="securityStatus" required class="admin-input">
+                                <option value="">Select Security</option>
+                                <option value="High (0.5-1.0)">High (0.5-1.0)</option>
+                                <option value="Medium (0.1-0.4)">Medium (0.1-0.4)</option>
+                                <option value="Low (0.0)">Low (0.0)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="siteNotes">Additional Notes:</label>
+                            <textarea id="siteNotes" class="admin-input" rows="3" placeholder="Any additional information about the site..."></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="admin-btn">Submit Report</button>
+                            <button type="button" id="cancelReport" class="admin-btn secondary">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main class="main-content">
+        <section id="ore-sites" class="mining-sites-section">
+            <div class="mining-sites-header">
+                <h2 class="section-title">Ore Sites</h2>
+                <p class="section-subtitle">Real-time status of active extraction operations, resource yields, and security conditions across our mining territories.</p>
+                <button id="reportNewSite" class="cta-btn report-site">⛏️ Report New Site</button>
+            </div>
+            
+            <div class="mining-sites-content">
+                <div class="mining-sites-filters">
+                    <input type="text" id="oreSiteSearch" placeholder="Search ore sites..." class="mining-search-input">
+                    <select id="oreSiteFilter" class="mining-filter-select">
+                        <option value="all">All Sites</option>
+                        <option value="active">Active Only</option>
+                        <option value="high-sec">High Security</option>
+                        <option value="low-sec">Low Security</option>
+                        <option value="null-sec">Null Security</option>
+                    </select>
+                    <select id="oreSiteSort" class="mining-sort-select">
+                        <option value="name">Sort by Name</option>
+                        <option value="yield">Sort by Yield</option>
+                        <option value="security">Sort by Security</option>
+                        <option value="status">Sort by Status</option>
+                    </select>
+                </div>
+                
+                <div class="mining-sites-stats">
+                    <div class="stat-card">
+                        <span class="stat-number" id="totalSites">0</span>
+                        <span class="stat-label">Total Sites</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number" id="activeSites">0</span>
+                        <span class="stat-label">Active Sites</span>
+                    </div>
+                </div>
+                
+                <div id="oreSitesList" class="mining-sites-list">
+                    <!-- Ore sites will be populated here -->
+                </div>
+            </div>
+        </section>
+    </main>
+    </div>
+
+    <!-- Hidden Canvas Element for The Architect's Signature -->
+    <canvas id="hiddenCanvas" width="100" height="100" style="display: none; position: absolute; left: -9999px; top: -9999px; width: 0; height: 0;"></canvas>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <a href="index.html">Home</a>
+                <a href="about.html">About</a>
+                <a href="ore-sites.html">Ore Sites</a>
+                <a href="roles.html">Roles</a>
+                <a href="events.html">Events</a>
+                <a href="members.html">Members</a>
+            </div>
+            <div class="footer-section">
+                <p>&copy; 2024 Trimark Industries. All rights reserved.</p>
+            </div>
+        </div>
+        
+        <!-- The Architect's Signature - Hidden in footer -->
+        <div class="architect-signature">
+            <svg class="animate-pulse-slow" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- The central, perfect triangle representing the unified universe -->
+                <path d="M50 5 L95 95 H5 L50 5 Z" stroke="#00F8FF" stroke-width="2" />
+                
+                <!-- Fragmentation lines, symbolizing the shattering of reality -->
+                <line x1="50" y1="5" x2="50" y2="30" stroke="#00F8FF" stroke-width="1.5" />
+                <line x1="50" y1="50" x2="50" y2="70" stroke="#00F8FF" stroke-width="1.5" />
+
+                <line x1="5" y1="95" x2="30" y2="95" stroke="#00F8FF" stroke-width="1.5" />
+                <line x1="70" y1="95" x2="95" y2="95" stroke="#00F8FF" stroke-width="1.5" />
+
+                <line x1="50" y1="50" x2="75" y2="75" stroke="#00F8FF" stroke-width="1.5" />
+                <line x1="50" y1="50" x2="25" y2="75" stroke="#00F8FF" stroke-width="1.5" />
+                
+                <!-- Central point of purpose or "eye" of the Architect -->
+                <circle cx="50" cy="50" r="4" fill="#00F8FF" />
+            </svg>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        // Ensure wallet connection works on this page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Wait for script.js to load and initialize
+            setTimeout(() => {
+                // Check if the wallet connection is working
+                const connectWalletBtn = document.getElementById('connectWallet');
+                if (connectWalletBtn) {
+                    console.log('✅ Connect wallet button found on Ore Sites page');
+                    
+                    // Add click event listener if not already added
+                    if (!connectWalletBtn.hasAttribute('data-listener-added')) {
+                        connectWalletBtn.addEventListener('click', async function() {
+                            console.log('🔌 Connect wallet clicked on Ore Sites page');
+                            
+                            try {
+                                // Try to use OneKey wallet first if available
+                                if (window.onekeyProvider) {
+                                    console.log('🔌 Using OneKey wallet provider');
+                                    const accounts = await window.onekeyProvider.request({ 
+                                        method: 'eth_requestAccounts' 
+                                    });
+                                    
+                                    if (accounts.length > 0) {
+                                        console.log('✅ OneKey wallet connected:', accounts[0]);
+                                        // Call the global connectWallet function
+                                        if (typeof window.connectWallet === 'function') {
+                                            window.connectWallet();
+                                        } else {
+                                            console.error('❌ connectWallet function not found');
+                                        }
+                                    }
+                                } else if (typeof window.connectWallet === 'function') {
+                                    console.log('🔌 Using fallback connectWallet function');
+                                    window.connectWallet();
+                                } else {
+                                    console.error('❌ No wallet provider or connectWallet function available');
+                                    alert('No wallet provider available. Please install OneKey Wallet or MetaMask!');
+                                }
+                            } catch (error) {
+                                console.error('❌ Error connecting wallet:', error);
+                                alert('Failed to connect wallet: ' + error.message);
+                            }
+                        });
+                        connectWalletBtn.setAttribute('data-listener-added', 'true');
+                    }
+                } else {
+                    console.error('❌ Connect wallet button not found on Ore Sites page');
+                }
+                
+                // Check if OneKey wallet detection is working
+                if (typeof window.initializeOneKeyWallet === 'function') {
+                    console.log('✅ OneKey wallet detection available');
+                    // Initialize OneKey wallet detection
+                    window.initializeOneKeyWallet();
+                } else {
+                    console.error('❌ OneKey wallet detection not available');
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

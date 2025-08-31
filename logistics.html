@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Services - Active Operations</title>
+    <title>Logistics Network - Trimark Industries</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js" type="application/javascript" onerror="loadEthersFallback()"></script>
@@ -38,8 +38,9 @@
             <nav class="nav">
                 <a href="index.html" class="nav-link">Home</a>
                 <a href="about.html" class="nav-link">About</a>
-                <a href="services.html" class="nav-link active">Services</a>
+                <a href="services.html" class="nav-link">Services</a>
                 <a href="roles.html" class="nav-link">Roles</a>
+                <a href="members.html" class="nav-link">Members</a>
                 <a href="events.html" class="nav-link">Events</a>
             </nav>
 
@@ -137,25 +138,110 @@
             </div>
         </div>
 
+        <!-- Add Logistics Route Modal -->
+        <div id="addLogisticsRouteModal" class="admin-modal hidden">
+            <div class="admin-modal-content">
+                <div class="admin-modal-header">
+                    <h2>🚛 Add Logistics Route</h2>
+                    <button id="closeLogisticsModal" class="close-btn">×</button>
+                </div>
+                <div class="admin-modal-body">
+                    <div class="admin-section">
+                        <form id="logisticsRouteForm">
+                            <div class="form-group">
+                                <label for="routeName">Route Name:</label>
+                                <input type="text" id="routeName" required class="admin-input">
+                            </div>
+                            <div class="form-group">
+                                <label for="originSystem">Origin System:</label>
+                                <input type="text" id="originSystem" required class="admin-input">
+                            </div>
+                            <div class="form-group">
+                                <label for="destinationSystem">Destination System:</label>
+                                <input type="text" id="destinationSystem" required class="admin-input">
+                            </div>
+                            <div class="form-group">
+                                <label for="cargoType">Cargo Type:</label>
+                                <input type="text" id="cargoType" required class="admin-input" placeholder="e.g., Ore, Ships, Components">
+                            </div>
+                            <div class="form-group">
+                                <label for="cargoVolume">Cargo Volume (m³):</label>
+                                <input type="number" id="cargoVolume" required class="admin-input" min="1">
+                            </div>
+                            <div class="form-group">
+                                <label for="assignedPilot">Assigned Pilot:</label>
+                                <input type="text" id="assignedPilot" required class="admin-input">
+                            </div>
+                            <div class="form-group">
+                                <label for="priority">Priority:</label>
+                                <select id="priority" required class="admin-input">
+                                    <option value="low">Low</option>
+                                    <option value="normal" selected>Normal</option>
+                                    <option value="high">High</option>
+                                    <option value="critical">Critical</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="routeNotes">Route Notes:</label>
+                                <textarea id="routeNotes" class="admin-input" rows="3" placeholder="Any special requirements or notes..."></textarea>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="admin-btn">Add Route</button>
+                                <button type="button" id="cancelLogistics" class="admin-btn secondary">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <main class="main-content">
-            <section id="services" class="services-section">
-                <h2 class="section-title">Active Operations</h2>
-                <div class="services-grid">
-                    <div class="service-item">
-                        <h3>Current Mining Sites</h3>
-                        <p>Real-time status of active extraction operations, resource yields, and security conditions across our mining territories.</p>
+            <section id="logistics" class="logistics-section">
+                <div class="logistics-header">
+                    <h2 class="section-title">Logistics Network</h2>
+                    <p class="section-subtitle">Current trade routes, supply chain status, and transportation schedules for optimal resource distribution.</p>
+                    <button id="addLogisticsRoute" class="cta-btn">🚛 Add Logistics Route</button>
+                </div>
+                
+                <div class="logistics-content">
+                    <div class="logistics-filters">
+                        <input type="text" id="logisticsSearch" placeholder="Search routes..." class="logistics-search-input">
+                        <select id="logisticsFilter" class="logistics-filter-select">
+                            <option value="all">All Routes</option>
+                            <option value="active">Active Only</option>
+                            <option value="completed">Completed</option>
+                            <option value="pending">Pending</option>
+                            <option value="delayed">Delayed</option>
+                        </select>
+                        <select id="logisticsSort" class="logistics-sort-select">
+                            <option value="priority">Sort by Priority</option>
+                            <option value="status">Sort by Status</option>
+                            <option value="arrival">Sort by Arrival</option>
+                            <option value="pilot">Sort by Pilot</option>
+                        </select>
                     </div>
-                    <div class="service-item">
-                        <h3>Manufacturing Status</h3>
-                        <p>Production queue updates, blueprint efficiency ratings, and quality control reports from our industrial facilities.</p>
+                    
+                    <div class="logistics-stats">
+                        <div class="stat-card">
+                            <span class="stat-number" id="totalRoutes">0</span>
+                            <span class="stat-label">Total Routes</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-number" id="activeRoutes">0</span>
+                            <span class="stat-label">Active Routes</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-number" id="totalCargo">0</span>
+                            <span class="stat-label">Total Cargo (m³)</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-number" id="onTimeDelivery">0%</span>
+                            <span class="stat-label">On-Time Delivery</span>
+                        </div>
                     </div>
-                    <div class="service-item">
-                        <h3>Logistics Network</h3>
-                        <p>Current trade routes, supply chain status, and transportation schedules for optimal resource distribution.</p>
-                    </div>
-                    <div class="service-item">
-                        <h3>Security Updates</h3>
-                        <p>Latest intelligence on threats, safe passage recommendations, and coordination protocols for member safety.</p>
+                    
+                    <div id="logisticsList" class="logistics-list">
+                        <!-- Logistics routes will be populated here -->
                     </div>
                 </div>
             </section>
@@ -169,6 +255,7 @@
                     <a href="about.html">About</a>
                     <a href="services.html">Services</a>
                     <a href="roles.html">Roles</a>
+                    <a href="members.html">Members</a>
                     <a href="events.html">Events</a>
                 </div>
                 <div class="footer-section">
