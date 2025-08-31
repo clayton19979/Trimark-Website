@@ -94,6 +94,9 @@ jspm_packages/
 tmp/
 temp/
 
+# Project-specific directories
+Coding Info/
+
 # OS generated files
 .DS_Store
 .DS_Store?
