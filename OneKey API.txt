@@ -1,0 +1,29 @@
+// This code snippet demonstrates how to listen for announced providers
+// and store them for your dApp to use.
+
+let onekeyProvider = null;
+
+const onAnnounceProvider = (event) => {
+  // The event.detail contains the provider info and the provider object itself.
+  // event.detail = { info: { uuid, name, icon, rdns }, provider }
+  if (event.detail.info.name === 'OneKey') {
+    onekeyProvider = event.detail.provider;
+  }
+  // You can also store all providers in an array to let users choose.
+};
+
+// Listen for the announcement event from all wallets
+window.addEventListener('eip6963:announceProvider', onAnnounceProvider);
+
+// It's also good practice to dispatch a request event to prompt wallets
+// that may have loaded after the initial page load.
+window.dispatchEvent(new Event('eip6963:requestProvider'));
+
+// After a short delay, you can check if the onekeyProvider was found.
+setTimeout(() => {
+  if (onekeyProvider) {
+    startApp(onekeyProvider);
+  } else {
+    console.log('OneKey Wallet not found. Please install it from onekey.so/download');
+  }
+}, 500);

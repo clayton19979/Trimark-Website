@@ -103,11 +103,8 @@ document.addEventListener('DOMContentLoaded', function() {
          // Initialize events system
          initializeEvents();
          
-         // Check if welcome screen should be shown
-         const welcomeShown = localStorage.getItem('trimark_welcome_shown');
-         if (welcomeShown) {
-             showWelcomeScreen = false;
-         }
+         // Welcome screen will show every time wallet is connected
+         shouldShowWelcomeScreen = true;
          
          // Setup autocomplete after a delay to ensure DOM is ready
          setTimeout(() => {
@@ -116,9 +113,91 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 500);
 });
 
+// OneKey Wallet Provider
+let onekeyProvider = null;
+
+// Initialize OneKey wallet detection
+function initializeOneKeyWallet() {
+    console.log('🔍 Initializing OneKey wallet detection...');
+    
+    const onAnnounceProvider = (event) => {
+        // The event.detail contains the provider info and the provider object itself.
+        // event.detail = { info: { uuid, name, icon, rdns }, provider }
+        if (event.detail.info.name === 'OneKey') {
+            onekeyProvider = event.detail.provider;
+            console.log('✅ OneKey wallet detected!');
+            walletType = 'onekey';
+            
+            // Check if already connected
+            checkExistingOneKeyConnection();
+        }
+        // You can also store all providers in an array to let users choose.
+    };
+
+    // Listen for the announcement event from all wallets
+    window.addEventListener('eip6963:announceProvider', onAnnounceProvider);
+
+    // It's also good practice to dispatch a request event to prompt wallets
+    // that may have loaded after the initial page load.
+    window.dispatchEvent(new Event('eip6963:requestProvider'));
+
+    // After a short delay, check if the onekeyProvider was found.
+    setTimeout(() => {
+        if (onekeyProvider) {
+            console.log('✅ OneKey wallet ready!');
+            if (connectWalletBtn) {
+                connectWalletBtn.textContent = 'Connect OneKey Wallet';
+                connectWalletBtn.disabled = false;
+            }
+        } else {
+            console.log('❌ OneKey Wallet not found. Please install it from onekey.so/download');
+            if (connectWalletBtn) {
+                connectWalletBtn.textContent = 'Install OneKey Wallet';
+                connectWalletBtn.disabled = false;
+            }
+        }
+    }, 500);
+}
+
+// Check if OneKey wallet is already connected
+async function checkExistingOneKeyConnection() {
+    if (!onekeyProvider) return;
+    
+    try {
+        const accounts = await onekeyProvider.request({ 
+            method: 'eth_accounts' 
+        });
+        
+        if (accounts.length > 0) {
+            console.log('✅ Found existing OneKey wallet connection:', accounts[0]);
+            currentAccount = accounts[0];
+            isConnected = true;
+            
+            // Create ethers provider and signer
+            provider = new ethers.providers.Web3Provider(onekeyProvider);
+            signer = provider.getSigner();
+            
+            // Get network info
+            const network = await provider.getNetwork();
+            chainId = network.chainId;
+            
+            // Update UI
+            await updateUserProfile();
+            
+            // Load approved users first, then check admin status
+            loadApprovedUsers();
+            checkAdminStatus();
+            
+            setupOneKeyWalletListeners();
+        }
+    } catch (error) {
+        console.error('Error checking existing OneKey connection:', error);
+    }
+}
+
 // Initialize the application
 function initializeApp() {
-    console.log('Initializing app with MetaMask detection...');
+    console.log('Initializing app with wallet detection...');
     
     // Check if ethers is available
     if (typeof ethers === 'undefined') {
@@ -132,25 +211,28 @@ function initializeApp() {
     // Initialize admin system
     loadApprovedUsers();
     
-    // Check if MetaMask is available
+    // Initialize OneKey wallet detection
+    initializeOneKeyWallet();
+    
+    // Also check for MetaMask as fallback
     if (typeof window.ethereum !== 'undefined') {
-        console.log('✅ MetaMask detected!');
+        console.log('✅ MetaMask detected as fallback!');
         walletType = 'metamask';
         
         // Check if already connected
         checkExistingConnection();
     } else {
-        console.log('❌ No wallet detected');
+        console.log('❌ No MetaMask detected');
         walletType = 'none';
         
         if (connectWalletBtn) {
-            connectWalletBtn.textContent = 'Install MetaMask';
-            connectWalletBtn.disabled = true;
+            connectWalletBtn.textContent = 'Install OneKey Wallet';
+            connectWalletBtn.disabled = false;
         }
     }
 }
 
-// Check if wallet is already connected
+// Check if MetaMask wallet is already connected
 async function checkExistingConnection() {
     try {
         if (typeof window.ethereum !== 'undefined') {
@@ -159,9 +241,10 @@ async function checkExistingConnection() {
             });
             
             if (accounts.length > 0) {
-                console.log('✅ Found existing wallet connection:', accounts[0]);
+                console.log('✅ Found existing MetaMask wallet connection:', accounts[0]);
                 currentAccount = accounts[0];
                 isConnected = true;
+                walletType = 'metamask';
                 
                 // Create provider and signer
                 provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -182,7 +265,7 @@ async function checkExistingConnection() {
             }
         }
     } catch (error) {
-        console.error('Error checking existing connection:', error);
+        console.error('Error checking existing MetaMask connection:', error);
     }
 }
 
@@ -391,7 +474,7 @@ function handleNavigation(e) {
     }
 }
 
-// Connect wallet function using MetaMask
+// Connect wallet function using OneKey or MetaMask
 async function connectWallet() {
     console.log('🔌 Connect wallet function called!');
     
@@ -409,26 +492,49 @@ async function connectWallet() {
             throw new Error('Ethers library not loaded. Please refresh the page and try again.');
         }
 
-        // Check if MetaMask is available
-        if (typeof window.ethereum === 'undefined') {
-            throw new Error('Please install MetaMask or another Web3 wallet!');
+        let accounts = [];
+        let selectedProvider = null;
+
+        // Try OneKey wallet first
+        if (onekeyProvider) {
+            console.log('🔌 OneKey wallet detected, requesting accounts...');
+            try {
+                accounts = await onekeyProvider.request({ 
+                    method: 'eth_requestAccounts' 
+                });
+                selectedProvider = onekeyProvider;
+                walletType = 'onekey';
+                console.log('✅ OneKey accounts received:', accounts);
+            } catch (err) {
+                console.log('❌ OneKey connection failed, trying MetaMask...');
+            }
         }
 
-        console.log('🔌 MetaMask detected, requesting accounts...');
+        // Fallback to MetaMask if OneKey failed or not available
+        if (!selectedProvider && typeof window.ethereum !== 'undefined') {
+            console.log('🔌 MetaMask detected, requesting accounts...');
+            try {
+                accounts = await window.ethereum.request({ 
+                    method: 'eth_requestAccounts' 
+                });
+                selectedProvider = window.ethereum;
+                walletType = 'metamask';
+                console.log('✅ MetaMask accounts received:', accounts);
+            } catch (err) {
+                console.log('❌ MetaMask connection failed');
+            }
+        }
 
-        // Request account access
-        const accounts = await window.ethereum.request({ 
-            method: 'eth_requestAccounts' 
-        });
+        if (!selectedProvider) {
+            throw new Error('No wallet provider available. Please install OneKey Wallet or MetaMask!');
+        }
 
         if (accounts.length === 0) {
             throw new Error('No accounts found!');
         }
 
-        console.log('✅ Accounts received:', accounts);
-
         // Create ethers provider and signer
-        provider = new ethers.providers.Web3Provider(window.ethereum);
+        provider = new ethers.providers.Web3Provider(selectedProvider);
         signer = provider.getSigner();
         
         // Get network info
@@ -441,6 +547,7 @@ async function connectWallet() {
 
         console.log('✅ Wallet connected successfully:', currentAccount);
         console.log('🔗 Network chain ID:', chainId);
+        console.log('🔗 Wallet type:', walletType);
 
         // Update UI
         await updateUserProfile();
@@ -449,11 +556,15 @@ async function connectWallet() {
         loadApprovedUsers();
         checkAdminStatus();
         
-        // Set up wallet event listeners
-        setupWalletListeners();
+        // Set up wallet event listeners based on wallet type
+        if (walletType === 'onekey') {
+            setupOneKeyWalletListeners();
+        } else {
+            setupWalletListeners();
+        }
 
         // Show success message
-        alert('Wallet connected successfully! Account: ' + currentAccount.slice(0, 6) + '...' + currentAccount.slice(-4));
+        alert(`${walletType === 'onekey' ? 'OneKey' : 'MetaMask'} wallet connected successfully! Account: ` + currentAccount.slice(0, 6) + '...' + currentAccount.slice(-4));
 
     } catch (err) {
         error = err.message;
@@ -461,17 +572,69 @@ async function connectWallet() {
         alert('Failed to connect wallet: ' + err.message);
     } finally {
         isConnecting = false;
-        connectWalletBtn.textContent = 'Connect Wallet';
+        if (walletType === 'onekey') {
+            connectWalletBtn.textContent = 'Connect OneKey Wallet';
+        } else {
+            connectWalletBtn.textContent = 'Connect Wallet';
+        }
         connectWalletBtn.disabled = false;
     }
 }
 
-// Set up wallet event listeners
+// Set up OneKey wallet event listeners
+function setupOneKeyWalletListeners() {
+    if (onekeyProvider) {
+        // Listen for account changes
+        onekeyProvider.on('accountsChanged', (accounts) => {
+            console.log('🔌 OneKey accounts changed:', accounts);
+            if (accounts.length === 0) {
+                disconnectWallet();
+            } else {
+                currentAccount = accounts[0];
+                updateUserProfile();
+                // Check admin status for new account
+                loadApprovedUsers();
+                checkAdminStatus();
+                
+                // Check tribe access for new account
+                const userData = JSON.parse(localStorage.getItem('trimark_user_data') || '{}');
+                if (!hasRequiredTribeAccess(userData)) {
+                    showAccessDeniedMessage();
+                } else {
+                    // User has access, ensure content is visible
+                    const mainContent = document.querySelector('.main-content');
+                    if (mainContent) {
+                        mainContent.style.display = 'block';
+                    }
+                    const footer = document.querySelector('.footer');
+                    if (footer) {
+                        footer.style.display = 'block';
+                    }
+                }
+            }
+        });
+
+        // Listen for chain changes
+        onekeyProvider.on('chainChanged', (newChainId) => {
+            console.log('🔗 OneKey chain changed:', newChainId);
+            chainId = parseInt(newChainId, 16);
+            window.location.reload(); // Reload to ensure clean state
+        });
+
+        // Listen for disconnect
+        onekeyProvider.on('disconnect', () => {
+            console.log('🔌 OneKey wallet disconnected');
+            disconnectWallet();
+        });
+    }
+}
+
+// Set up MetaMask wallet event listeners
 function setupWalletListeners() {
     if (typeof window.ethereum !== 'undefined') {
         // Listen for account changes
         window.ethereum.on('accountsChanged', (accounts) => {
-            console.log('🔌 Accounts changed:', accounts);
+            console.log('🔌 MetaMask accounts changed:', accounts);
             if (accounts.length === 0) {
                 disconnectWallet();
             } else {
@@ -501,14 +664,14 @@ function setupWalletListeners() {
 
         // Listen for chain changes
         window.ethereum.on('chainChanged', (newChainId) => {
-            console.log('🔗 Chain changed:', newChainId);
+            console.log('🔗 MetaMask chain changed:', newChainId);
             chainId = parseInt(newChainId, 16);
             window.location.reload(); // Reload to ensure clean state
         });
 
         // Listen for disconnect
         window.ethereum.on('disconnect', () => {
-            console.log('🔌 Wallet disconnected');
+            console.log('🔌 MetaMask wallet disconnected');
             disconnectWallet();
         });
     }
@@ -516,7 +679,7 @@ function setupWalletListeners() {
 
 
 
-// Handle account changes
+// Handle account changes for MetaMask
 async function handleAccountsChanged(accounts) {
     if (accounts.length === 0) {
         // Wallet is locked or the user has no accounts
@@ -597,7 +760,7 @@ async function updateUserProfile() {
             }
             
             // Show welcome screen for new users
-            if (showWelcomeScreen) {
+            if (shouldShowWelcomeScreen) {
                 // Get user's role
                 const userRoleEntry = Object.entries(userRoles).find(([characterName, roleData]) => 
                     roleData.memberAddress && roleData.memberAddress.toLowerCase() === currentAccount.toLowerCase()
@@ -742,7 +905,11 @@ function disconnectWallet() {
     
     // Re-enable and reset button
     connectWalletBtn.disabled = false;
-    connectWalletBtn.textContent = 'Connect Wallet';
+    if (walletType === 'onekey') {
+        connectWalletBtn.textContent = 'Connect OneKey Wallet';
+    } else {
+        connectWalletBtn.textContent = 'Connect Wallet';
+    }
     
 
     
@@ -1563,7 +1730,7 @@ let userRoles = {};
 let pendingRoleRequests = [];
 let tribeMembers = []; // Store tribe members data
 let events = []; // Store events data
-let showWelcomeScreen = true; // Control welcome screen display
+let shouldShowWelcomeScreen = true; // Control welcome screen display
 
 // Initialize role management
 function initializeRoleManagement() {
@@ -2060,7 +2227,7 @@ function renderEvents() {
 
 // Welcome Screen System
 function showWelcomeScreen(userName, userPortrait, userRole) {
-    if (!showWelcomeScreen) return;
+    if (!shouldShowWelcomeScreen) return;
     
     // Create welcome screen modal
     const welcomeModal = document.createElement('div');
@@ -2104,8 +2271,7 @@ function closeWelcomeScreen() {
     const welcomeModal = document.querySelector('.welcome-modal');
     if (welcomeModal) {
         welcomeModal.remove();
-        showWelcomeScreen = false;
-        localStorage.setItem('trimark_welcome_shown', 'true');
+        // Don't set localStorage flag - welcome screen will show again next time
     }
 }
 
@@ -2146,5 +2312,10 @@ window.TrimarkApp = {
     getUserRole,
     createEvent,
     deleteEvent,
-    renderEvents
+    renderEvents,
+    resetWelcomeScreen: () => {
+        localStorage.removeItem('trimark_welcome_shown');
+        shouldShowWelcomeScreen = true;
+        console.log('Welcome screen reset - will show on next wallet connection');
+    }
 };
