@@ -438,11 +438,7 @@ function setupEventListeners() {
         });
     }
     
-    // Form submission
-    const contactForm = document.querySelector('.contact-form');
-    if (contactForm) {
-        contactForm.addEventListener('submit', handleContactForm);
-    }
+
     
     // Smooth scrolling for navigation links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -736,7 +732,14 @@ async function updateUserProfile() {
             // User has access - update UI with user data
             userPortrait.src = userData.portraitUrl || 'https://artifacts.evefrontier.com/portraits/PortraitAwakened256.png';
             userName.textContent = userData.name || 'Unknown Character';
-            userAddress.textContent = `${currentAccount.slice(0, 6)}...${currentAccount.slice(-4)}`;
+            
+            // Get user's role and display it instead of wallet address
+            const userRoleEntry = Object.entries(userRoles).find(([characterName, roleData]) => 
+                roleData.memberAddress && roleData.memberAddress.toLowerCase() === currentAccount.toLowerCase()
+            );
+            const userRole = userRoleEntry ? userRoleEntry[1].role : null;
+            const roleDisplay = userRole ? ROLE_TYPES[userRole].name : 'No Role Assigned';
+            userAddress.textContent = roleDisplay;
             
             // Store user data for later use
             localStorage.setItem('trimark_user_data', JSON.stringify(userData));
@@ -759,8 +762,8 @@ async function updateUserProfile() {
                 accessDeniedMessage.remove();
             }
             
-            // Show welcome screen for new users
-            if (shouldShowWelcomeScreen) {
+            // Show welcome screen for new users (only once per session)
+            if (shouldShowWelcomeScreen && !sessionStorage.getItem('trimark_welcome_shown')) {
                 // Get user's role
                 const userRoleEntry = Object.entries(userRoles).find(([characterName, roleData]) => 
                     roleData.memberAddress && roleData.memberAddress.toLowerCase() === currentAccount.toLowerCase()
@@ -768,6 +771,7 @@ async function updateUserProfile() {
                 const userRole = userRoleEntry ? ROLE_TYPES[userRoleEntry[1].role] : null;
                 
                 showWelcomeScreen(userData.name, userData.portraitUrl || 'https://artifacts.evefrontier.com/portraits/PortraitAwakened256.png', userRole);
+                sessionStorage.setItem('trimark_welcome_shown', 'true');
             }
             
             // Add success animation
@@ -901,7 +905,7 @@ function disconnectWallet() {
     // Reset UI elements
     userPortrait.src = '';
     userName.textContent = '';
-    userAddress.textContent = '';
+    userAddress.textContent = 'No Role Assigned';
     
     // Re-enable and reset button
     connectWalletBtn.disabled = false;
@@ -942,38 +946,7 @@ async function checkWalletConnection() {
 
 
 
-// Handle contact form submission
-function handleContactForm(e) {
-    e.preventDefault();
-    
-    const messageTextarea = document.getElementById('message');
-    const message = messageTextarea.value.trim();
-    
-    if (!message) {
-        alert('Please enter a message before submitting.');
-        return;
-    }
-    
-    if (!currentAccount) {
-        alert('Please connect your wallet to send a message.');
-        return;
-    }
-    
-    // Simulate form submission
-    const submitBtn = e.target.querySelector('.submit-btn');
-    const originalText = submitBtn.textContent;
-    
-    submitBtn.textContent = 'Sending...';
-    submitBtn.disabled = true;
-    
-    // Simulate API call delay
-    setTimeout(() => {
-        alert('Thank you for your message! We will get back to you soon.');
-        messageTextarea.value = '';
-        submitBtn.textContent = originalText;
-        submitBtn.disabled = false;
-    }, 2000);
-}
+
 
 // WalletConnect event listeners are now handled in setupWalletConnectListeners()
 
@@ -2315,6 +2288,7 @@ window.TrimarkApp = {
     renderEvents,
     resetWelcomeScreen: () => {
         localStorage.removeItem('trimark_welcome_shown');
+        sessionStorage.removeItem('trimark_welcome_shown');
         shouldShowWelcomeScreen = true;
         console.log('Welcome screen reset - will show on next wallet connection');
     }

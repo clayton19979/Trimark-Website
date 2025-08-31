@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trimark Industries - Dashboard</title>
+    <title>Services - Active Operations</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js" type="application/javascript" onerror="loadEthersFallback()"></script>
@@ -27,7 +27,7 @@
         <header class="header">
             <div class="logo">
                 <div class="logo-image">
-                    <img src="ChatGPT_Image_Jul_3_2025_08_34_57_PM.png" alt="Trimark Industries Logo" class="corp-logo">
+                    <img src="ChatGPT_Image_Jul_3_2025_08_34_57_PM.png" alt="Logo" class="corp-logo">
                 </div>
                 <div class="logo-text">
                     <h1>TRIMARK INDUSTRIES</h1>
@@ -36,9 +36,9 @@
             </div>
             
             <nav class="nav">
-                <a href="home.html" class="nav-link">Home</a>
+                <a href="index.html" class="nav-link">Home</a>
                 <a href="about.html" class="nav-link">About</a>
-                <a href="services.html" class="nav-link">Services</a>
+                <a href="services.html" class="nav-link active">Services</a>
                 <a href="roles.html" class="nav-link">Roles</a>
                 <a href="events.html" class="nav-link">Events</a>
             </nav>
@@ -138,39 +138,25 @@
         </div>
 
         <main class="main-content">
-            <section id="dashboard" class="dashboard-section">
-                <h2 class="section-title">Welcome to Trimark Industries</h2>
-                <p style="text-align: center; color: #ccc; font-size: 1.2rem; margin-bottom: 60px; max-width: 800px; margin-left: auto; margin-right: auto;">
-                    Welcome back, fellow frontier builders. Access your corporation dashboard, 
-                    view current operations, and stay updated on our latest industrial ventures 
-                    across the EVE Frontier universe.
-                </p>
-                <div class="dashboard-grid">
-                    <a href="home.html" class="dashboard-card">
-                        <div class="card-icon">🏠</div>
-                        <h3>Home</h3>
-                        <p>Welcome page with corporation overview and quick access to key areas.</p>
-                    </a>
-                    <a href="roles.html" class="dashboard-card">
-                        <div class="card-icon">👥</div>
-                        <h3>Role Management</h3>
-                        <p>Manage member roles, assign responsibilities, and control access to different areas of operations.</p>
-                    </a>
-                    <a href="events.html" class="dashboard-card">
-                        <div class="card-icon">📅</div>
-                        <h3>Corporation Events</h3>
-                        <p>Stay informed about scheduled operations, training sessions, and corporate events.</p>
-                    </a>
-                    <a href="about.html" class="dashboard-card">
-                        <div class="card-icon">📊</div>
-                        <h3>Member Resources</h3>
-                        <p>Access operations dashboard, mission board, and corporation tools.</p>
-                    </a>
-                    <a href="services.html" class="dashboard-card">
-                        <div class="card-icon">🏭</div>
-                        <h3>Active Operations</h3>
-                        <p>Monitor mining sites, manufacturing status, logistics network, and security updates.</p>
-                    </a>
+            <section id="services" class="services-section">
+                <h2 class="section-title">Active Operations</h2>
+                <div class="services-grid">
+                    <div class="service-item">
+                        <h3>Current Mining Sites</h3>
+                        <p>Real-time status of active extraction operations, resource yields, and security conditions across our mining territories.</p>
+                    </div>
+                    <div class="service-item">
+                        <h3>Manufacturing Status</h3>
+                        <p>Production queue updates, blueprint efficiency ratings, and quality control reports from our industrial facilities.</p>
+                    </div>
+                    <div class="service-item">
+                        <h3>Logistics Network</h3>
+                        <p>Current trade routes, supply chain status, and transportation schedules for optimal resource distribution.</p>
+                    </div>
+                    <div class="service-item">
+                        <h3>Security Updates</h3>
+                        <p>Latest intelligence on threats, safe passage recommendations, and coordination protocols for member safety.</p>
+                    </div>
                 </div>
             </section>
         </main>
@@ -179,7 +165,7 @@
             <div class="footer-content">
                 <div class="footer-section">
                     <h4>Quick Links</h4>
-                    <a href="home.html">Home</a>
+                    <a href="index.html">Home</a>
                     <a href="about.html">About</a>
                     <a href="services.html">Services</a>
                     <a href="roles.html">Roles</a>
@@ -198,4 +184,4 @@
 
     <script src="script.js"></script>
 </body>
-</html> 
+</html>

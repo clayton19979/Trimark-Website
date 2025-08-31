@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trimark Industries - Dashboard</title>
+    <title>Home - Trimark Industries</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js" type="application/javascript" onerror="loadEthersFallback()"></script>
@@ -36,7 +36,7 @@
             </div>
             
             <nav class="nav">
-                <a href="home.html" class="nav-link">Home</a>
+                <a href="home.html" class="nav-link active">Home</a>
                 <a href="about.html" class="nav-link">About</a>
                 <a href="services.html" class="nav-link">Services</a>
                 <a href="roles.html" class="nav-link">Roles</a>
@@ -138,39 +138,26 @@
         </div>
 
         <main class="main-content">
-            <section id="dashboard" class="dashboard-section">
-                <h2 class="section-title">Welcome to Trimark Industries</h2>
-                <p style="text-align: center; color: #ccc; font-size: 1.2rem; margin-bottom: 60px; max-width: 800px; margin-left: auto; margin-right: auto;">
-                    Welcome back, fellow frontier builders. Access your corporation dashboard, 
-                    view current operations, and stay updated on our latest industrial ventures 
-                    across the EVE Frontier universe.
-                </p>
-                <div class="dashboard-grid">
-                    <a href="home.html" class="dashboard-card">
-                        <div class="card-icon">🏠</div>
-                        <h3>Home</h3>
-                        <p>Welcome page with corporation overview and quick access to key areas.</p>
-                    </a>
-                    <a href="roles.html" class="dashboard-card">
-                        <div class="card-icon">👥</div>
-                        <h3>Role Management</h3>
-                        <p>Manage member roles, assign responsibilities, and control access to different areas of operations.</p>
-                    </a>
-                    <a href="events.html" class="dashboard-card">
-                        <div class="card-icon">📅</div>
-                        <h3>Corporation Events</h3>
-                        <p>Stay informed about scheduled operations, training sessions, and corporate events.</p>
-                    </a>
-                    <a href="about.html" class="dashboard-card">
-                        <div class="card-icon">📊</div>
-                        <h3>Member Resources</h3>
-                        <p>Access operations dashboard, mission board, and corporation tools.</p>
-                    </a>
-                    <a href="services.html" class="dashboard-card">
-                        <div class="card-icon">🏭</div>
-                        <h3>Active Operations</h3>
-                        <p>Monitor mining sites, manufacturing status, logistics network, and security updates.</p>
-                    </a>
+            <section id="home" class="hero-section">
+                <div class="hero-content">
+                    <h2 class="hero-title">Welcome to Trimark Industries</h2>
+                    <p class="hero-description">
+                        Welcome back, fellow frontier builders. Access your corporation dashboard, 
+                        view current operations, and stay updated on our latest industrial ventures 
+                        across the EVE Frontier universe.
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="about.html" class="cta-btn primary">Member Resources</a>
+                        <a href="services.html" class="cta-btn secondary">Active Operations</a>
+                    </div>
+                </div>
+                
+                <div class="hero-visual">
+                    <div class="space-station">
+                        <div class="station-core"></div>
+                        <div class="station-ring"></div>
+                        <div class="station-details"></div>
+                    </div>
                 </div>
             </section>
         </main>
@@ -198,4 +185,4 @@
 
     <script src="script.js"></script>
 </body>
-</html> 
+</html>

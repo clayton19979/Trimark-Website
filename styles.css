@@ -237,9 +237,10 @@ body {
 }
 
 .user-address {
-    font-size: 0.7rem;
-    color: #888;
-    font-family: monospace;
+    font-size: 0.8rem;
+    color: #00d4ff;
+    font-weight: 500;
+    font-family: 'Exo 2', sans-serif;
 }
 
 .disconnect-btn {
@@ -311,6 +312,9 @@ body {
     cursor: pointer;
     transition: all 0.3s ease;
     font-size: 1rem;
+    text-decoration: none;
+    display: inline-block;
+    color: inherit;
 }
 
 .cta-btn.primary {
@@ -398,6 +402,56 @@ body {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+}
+
+/* Dashboard Section */
+.dashboard-section {
+    padding: 80px 0;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.dashboard-card {
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(0, 212, 255, 0.3);
+    border-radius: 15px;
+    padding: 30px;
+    text-align: center;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    color: inherit;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-10px);
+    border-color: rgba(0, 212, 255, 0.6);
+    box-shadow: 0 20px 40px rgba(0, 212, 255, 0.2);
+}
+
+.dashboard-card .card-icon {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    display: block;
+}
+
+.dashboard-card h3 {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    color: #00d4ff;
+}
+
+.dashboard-card p {
+    color: #ccc;
+    line-height: 1.6;
 }
 
 /* About Section */
@@ -1179,104 +1233,7 @@ body {
     padding: 20px;
 }
 
-/* Contact Section */
-.contact-section {
-    padding: 80px 0;
-}
 
-.contact-content {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 60px;
-    align-items: start;
-}
-
-.contact-info h3 {
-    font-size: 1.8rem;
-    margin-bottom: 20px;
-    color: #00d4ff;
-    font-weight: 600;
-}
-
-.contact-info p {
-    color: #ccc;
-    line-height: 1.6;
-    margin-bottom: 30px;
-    font-weight: 300;
-}
-
-.contact-details {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.contact-item {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    color: #aaa;
-}
-
-.contact-icon {
-    font-size: 1.5rem;
-    color: #ff6b6b;
-}
-
-.contact-form {
-    background: rgba(255, 255, 255, 0.05);
-    padding: 40px;
-    border-radius: 20px;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.form-group {
-    margin-bottom: 25px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 8px;
-    color: #00d4ff;
-    font-weight: 500;
-}
-
-.form-group textarea {
-    width: 100%;
-    height: 120px;
-    padding: 15px;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 10px;
-    color: white;
-    font-family: inherit;
-    resize: vertical;
-    transition: all 0.3s ease;
-}
-
-.form-group textarea:focus {
-    outline: none;
-    border-color: #00d4ff;
-    background: rgba(255, 255, 255, 0.15);
-}
-
-.submit-btn {
-    background: linear-gradient(135deg, #00d4ff, #ff6b6b);
-    color: white;
-    border: none;
-    padding: 15px 30px;
-    border-radius: 25px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    width: 100%;
-}
-
-.submit-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(0, 212, 255, 0.4);
-}
 
 /* Admin Panel Modal */
 .admin-modal {
@@ -1531,7 +1488,7 @@ body {
 }
 
 .user-address {
-    font-family: monospace;
+    font-family: 'Exo 2', sans-serif;
     font-size: 14px;
     color: #fff;
     margin-bottom: 5px;
