@@ -1,26 +1,45 @@
 const fs = require('fs');
+const https = require('https');
 
 // Function to fetch solar systems from EVE Frontier API
 async function fetchSolarSystems(offset = 0, limit = 1000) {
-    const url = `https://world-api-stillness.live.tech.evefrontier.com/v2/solarsystems?limit=${limit}&offset=${offset}`;
-    
-    try {
-        const response = await fetch(url, {
+    return new Promise((resolve, reject) => {
+        const url = `https://world-api-stillness.live.tech.evefrontier.com/v2/solarsystems?limit=${limit}&offset=${offset}`;
+        
+        const request = https.get(url, {
             headers: {
                 'accept': 'application/json'
             }
+        }, (response) => {
+            let data = '';
+            
+            response.on('data', (chunk) => {
+                data += chunk;
+            });
+            
+            response.on('end', () => {
+                try {
+                    if (response.statusCode === 200) {
+                        const jsonData = JSON.parse(data);
+                        resolve(jsonData);
+                    } else {
+                        reject(new Error(`HTTP error! status: ${response.statusCode}`));
+                    }
+                } catch (error) {
+                    reject(error);
+                }
+            });
         });
         
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
+        request.on('error', (error) => {
+            reject(error);
+        });
         
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error(`Error fetching systems with offset ${offset}:`, error);
-        return null;
-    }
+        request.setTimeout(30000, () => {
+            request.destroy();
+            reject(new Error('Request timeout'));
+        });
+    });
 }
 
 // Function to fetch all solar systems

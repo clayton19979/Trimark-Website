@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wallet Connection Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .status.success { background: #d4edda; color: #155724; }
+        .status.error { background: #f8d7da; color: #721c24; }
+        .status.info { background: #d1ecf1; color: #0c5460; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        button:disabled { background: #6c757d; cursor: not-allowed; }
+        .log {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔗 Wallet Connection Test</h1>
+    
+    <div class="test-section">
+        <h2>Wallet Detection</h2>
+        <button id="detectBtn">Detect Wallets</button>
+        <button id="testOneKeyBtn" disabled>Test OneKey</button>
+        <button id="connectBtn" disabled>Connect Wallet</button>
+        
+        <div id="detectionStatus" class="status info">Click "Detect Wallets" to start</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Connection Status</h2>
+        <div id="connectionStatus" class="status info">Not connected</div>
+        <div id="accountInfo" style="display: none;">
+            <p><strong>Account:</strong> <span id="accountAddress"></span></p>
+            <p><strong>Wallet Type:</strong> <span id="walletType"></span></p>
+            <p><strong>Chain ID:</strong> <span id="chainId"></span></p>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Debug Log</h2>
+        <div id="debugLog" class="log"></div>
+        <button id="clearLog">Clear Log</button>
+    </div>
+
+    <!-- Load ethers v6 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.8.1/ethers.umd.min.js"></script>
+    
+    <script>
+        let onekeyProvider = null;
+        let walletType = null;
+        let isConnected = false;
+        
+        // Debug logging
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('debugLog');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.innerHTML = `<span style="color: #666;">[${timestamp}]</span> ${message}`;
+            logDiv.appendChild(logEntry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+            console.log(message);
+        }
+        
+        // Update status display
+        function updateStatus(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `status ${type}`;
+        }
+        
+        // Initialize OneKey wallet detection
+        function initializeOneKeyWallet() {
+            log('🔍 Initializing OneKey wallet detection using EIP-6963...');
+            
+            const onAnnounceProvider = (event) => {
+                log(`🔍 Wallet provider announced: ${event.detail.info.name} (${event.detail.info.uuid})`);
+                
+                if (event.detail.info.name === 'OneKey') {
+                    onekeyProvider = event.detail.provider;
+                    log('✅ OneKey wallet detected via EIP-6963!');
+                    walletType = 'onekey';
+                    
+                    // Enable test button
+                    document.getElementById('testOneKeyBtn').disabled = false;
+                    document.getElementById('connectBtn').disabled = false;
+                    
+                    updateStatus('detectionStatus', 'OneKey wallet detected!', 'success');
+                }
+            };
+
+            // Listen for the announcement event from all wallets
+            window.addEventListener('eip6963:announceProvider', onAnnounceProvider);
+
+            // Dispatch request event to prompt wallets
+            window.dispatchEvent(new Event('eip6963:requestProvider'));
+            
+            log('📡 EIP-6963 request dispatched');
+        }
+        
+        // Test OneKey connection
+        async function testOneKeyConnection() {
+            if (!onekeyProvider) {
+                log('❌ No OneKey provider available for testing');
+                return false;
+            }
+            
+            try {
+                log('🧪 Testing OneKey wallet connection...');
+                
+                // Test basic provider methods
+                const chainId = await onekeyProvider.request({ method: 'eth_chainId' });
+                log(`✅ Chain ID test passed: ${chainId}`);
+                
+                // Test if we can get accounts (this won't prompt user)
+                const accounts = await onekeyProvider.request({ method: 'eth_accounts' });
+                log(`✅ Accounts test passed: ${accounts.length} account(s) found`);
+                
+                return true;
+            } catch (error) {
+                log(`❌ OneKey wallet test failed: ${error.message}`, 'error');
+                return false;
+            }
+        }
+        
+        // Connect wallet
+        async function connectWallet() {
+            if (!onekeyProvider) {
+                log('❌ No OneKey provider available');
+                return;
+            }
+            
+            try {
+                log('🔌 Connecting to OneKey wallet...');
+                updateStatus('connectionStatus', 'Connecting...', 'info');
+                
+                const accounts = await onekeyProvider.request({ 
+                    method: 'eth_requestAccounts' 
+                });
+                
+                if (accounts.length > 0) {
+                    isConnected = true;
+                    const account = accounts[0];
+                    
+                    // Create ethers provider
+                    const provider = new ethers.BrowserProvider(onekeyProvider);
+                    const network = await provider.getNetwork();
+                    
+                    // Update UI
+                    document.getElementById('accountAddress').textContent = account;
+                    document.getElementById('walletType').textContent = walletType;
+                    document.getElementById('chainId').textContent = network.chainId;
+                    document.getElementById('accountInfo').style.display = 'block';
+                    
+                    updateStatus('connectionStatus', 'Connected successfully!', 'success');
+                    log(`✅ Connected to account: ${account}`);
+                    log(`🔗 Chain ID: ${network.chainId}`);
+                    
+                    // Set up event listeners
+                    onekeyProvider.on('accountsChanged', (accounts) => {
+                        log(`🔌 Accounts changed: ${accounts}`);
+                        if (accounts.length === 0) {
+                            disconnectWallet();
+                        }
+                    });
+                    
+                    onekeyProvider.on('chainChanged', (chainId) => {
+                        log(`🔗 Chain changed: ${chainId}`);
+                        window.location.reload();
+                    });
+                    
+                } else {
+                    throw new Error('No accounts found');
+                }
+                
+            } catch (error) {
+                log(`❌ Connection failed: ${error.message}`, 'error');
+                updateStatus('connectionStatus', `Connection failed: ${error.message}`, 'error');
+            }
+        }
+        
+        // Disconnect wallet
+        function disconnectWallet() {
+            isConnected = false;
+            document.getElementById('accountInfo').style.display = 'none';
+            updateStatus('connectionStatus', 'Disconnected', 'info');
+            log('🔌 Wallet disconnected');
+        }
+        
+        // Event listeners
+        document.getElementById('detectBtn').addEventListener('click', () => {
+            log('🚀 Starting wallet detection...');
+            updateStatus('detectionStatus', 'Detecting wallets...', 'info');
+            initializeOneKeyWallet();
+            
+            // Check after a delay
+            setTimeout(() => {
+                if (!onekeyProvider) {
+                    updateStatus('detectionStatus', 'No OneKey wallet found. Please install OneKey Wallet from onekey.so/download', 'error');
+                    log('❌ OneKey wallet not detected after timeout');
+                }
+            }, 2000);
+        });
+        
+        document.getElementById('testOneKeyBtn').addEventListener('click', testOneKeyConnection);
+        document.getElementById('connectBtn').addEventListener('click', connectWallet);
+        document.getElementById('clearLog').addEventListener('click', () => {
+            document.getElementById('debugLog').innerHTML = '';
+        });
+        
+        // Auto-start detection
+        log('🚀 Auto-starting wallet detection...');
+        initializeOneKeyWallet();
+    </script>
+</body>
+</html>
+

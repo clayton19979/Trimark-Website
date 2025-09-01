@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wallet Gate Test - Trimark Industries</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+</head>
+<body>
+    <div class="stars"></div>
+    <div class="twinkling"></div>
+    
+    <div class="container">
+        <header class="header">
+            <div class="logo">
+                <div class="logo-image">
+                    <img src="ChatGPT_Image_Jul_3_2025_08_34_57_PM.png" alt="Trimark Industries Logo" class="corp-logo">
+                </div>
+                <div class="logo-text">
+                    <h1>TRIMARK INDUSTRIES</h1>
+                    <p class="tagline">Forging the Future in EVE Frontier</p>
+                </div>
+            </div>
+            
+            <nav class="nav">
+                <a href="#" class="nav-link">Home</a>
+                <a href="#" class="nav-link">About</a>
+                <a href="#" class="nav-link">Ore Sites</a>
+                <a href="#" class="nav-link">Roles</a>
+                <a href="#" class="nav-link">Members</a>
+                <a href="#" class="nav-link">Events</a>
+            </nav>
+
+            <!-- User profile shown after wallet connection -->
+            <div class="user-profile-section">
+                <div id="userProfile" class="user-profile hidden">
+                    <img id="userPortrait" src="" alt="Character Portrait" class="user-portrait">
+                    <div class="user-info">
+                        <span id="userName" class="user-name"></span>
+                        <span id="userAddress" class="user-address"></span>
+                    </div>
+                    <button id="disconnectWallet" class="disconnect-btn">×</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="hero-section">
+                <div class="hero-content">
+                    <h2>🔒 WALLET GATE TEST</h2>
+                    <p>This content should only be visible after connecting your wallet.</p>
+                    <p>If you can see this, the wallet gate system is working!</p>
+                </div>
+                <div class="hero-visual">
+                    <div class="space-station">
+                        <div class="station-ring"></div>
+                        <div class="station-core"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <h3>Test Content</h3>
+                <p>This is test content that should be hidden until wallet connection.</p>
+                <p>Current time: <span id="currentTime"></span></p>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>&copy; 2024 Trimark Industries. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Update current time
+        function updateTime() {
+            const timeElement = document.getElementById('currentTime');
+            if (timeElement) {
+                timeElement.textContent = new Date().toLocaleString();
+            }
+        }
+        
+        // Update time every second
+        setInterval(updateTime, 1000);
+        updateTime();
+    </script>
+</body>
+</html>

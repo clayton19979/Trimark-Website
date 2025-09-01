@@ -20,7 +20,7 @@
     <script src="https://unpkg.com/@metamask/detect-provider@2.0.0/dist/detect-provider.min.js"></script>
     <script src="systems-data.js"></script>
     <script>
-        // OneKey Wallet EIP-6963 Detection
+        // OneKey Wallet EIP-6963 Detection - Using official OneKey API pattern
         let onekeyProvider = null;
         
         const onAnnounceProvider = (event) => {
@@ -61,6 +61,9 @@
                     connectBtn.textContent = 'Connect OneKey Wallet';
                     connectBtn.disabled = false;
                 }
+                
+                // Check if already connected
+                checkExistingOneKeyConnection();
             } else {
                 console.log('❌ OneKey Wallet not found via EIP-6963. Please install it from onekey.so/download');
                 const connectBtn = document.getElementById('connectWallet');
@@ -70,6 +73,27 @@
                 }
             }
         }, 500);
+        
+        // Check if OneKey wallet is already connected
+        async function checkExistingOneKeyConnection() {
+            if (!onekeyProvider) return;
+            
+            try {
+                console.log('🔍 Checking existing OneKey wallet connection via EIP-6963...');
+                const accounts = await onekeyProvider.request({ 
+                    method: 'eth_accounts' 
+                });
+                
+                if (accounts.length > 0) {
+                    console.log('✅ Found existing OneKey wallet connection via EIP-6963:', accounts[0]);
+                    // The main script.js will handle the connection state
+                } else {
+                    console.log('ℹ️ No existing OneKey wallet connection found');
+                }
+            } catch (error) {
+                console.error('❌ Error checking existing OneKey EIP-6963 connection:', error);
+            }
+        }
     </script>
 </head>
 <body>
@@ -281,15 +305,15 @@
                             console.log('🔌 Connect wallet clicked on Ore Sites page');
                             
                             try {
-                                // Try to use OneKey wallet first if available
+                                // Try to use OneKey wallet first if available via EIP-6963
                                 if (window.onekeyProvider) {
-                                    console.log('🔌 Using OneKey wallet provider');
+                                    console.log('🔌 Using OneKey wallet provider via EIP-6963');
                                     const accounts = await window.onekeyProvider.request({ 
                                         method: 'eth_requestAccounts' 
                                     });
                                     
                                     if (accounts.length > 0) {
-                                        console.log('✅ OneKey wallet connected:', accounts[0]);
+                                        console.log('✅ OneKey wallet connected via EIP-6963:', accounts[0]);
                                         // Call the global connectWallet function
                                         if (typeof window.connectWallet === 'function') {
                                             window.connectWallet();
@@ -317,7 +341,7 @@
                 
                 // Check if OneKey wallet detection is working
                 if (typeof window.initializeOneKeyWallet === 'function') {
-                    console.log('✅ OneKey wallet detection available');
+                    console.log('✅ OneKey wallet detection available via EIP-6963');
                     // Initialize OneKey wallet detection
                     window.initializeOneKeyWallet();
                 } else {

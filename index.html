@@ -16,8 +16,28 @@
             script.onerror = () => console.error('All ethers CDNs failed');
             document.head.appendChild(script);
         }
+        
+        // Check wallet connection on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const walletConnected = localStorage.getItem('walletConnected');
+            const walletAccount = localStorage.getItem('walletAccount');
+            
+            if (!walletConnected || !walletAccount) {
+                console.log('❌ No wallet connection found, redirecting to landing page');
+                window.location.href = 'landing.html';
+                return;
+            }
+            
+            console.log('✅ Wallet connection verified:', walletAccount);
+        });
     </script>
     <script src="https://unpkg.com/@metamask/detect-provider@2.0.0/dist/detect-provider.min.js"></script>
+    <script>
+        // Make detectEthereumProvider available globally
+        window.detectEthereumProvider = window.detectEthereumProvider || function() {
+            return typeof window.ethereum !== 'undefined' ? window.ethereum : null;
+        };
+    </script>
 </head>
 <body>
     <div class="stars"></div>
@@ -44,19 +64,15 @@
                 <a href="events.html" class="nav-link">Events</a>
             </nav>
 
-            <div class="wallet-section">
-                <button id="connectWallet" class="wallet-btn">
-                    <span class="wallet-icon">🔗</span>
-                    Connect Wallet
-                </button>
-
+            <!-- User profile section - shown after wallet connection -->
+            <div class="user-profile-section">
                 <div id="userProfile" class="user-profile hidden">
                     <img id="userPortrait" src="" alt="Character Portrait" class="user-portrait">
                     <div class="user-info">
                         <span id="userName" class="user-name"></span>
                         <span id="userAddress" class="user-address"></span>
                     </div>
-                    <button id="disconnectWallet" class="disconnect-btn">×</button>
+                    <button id="disconnectWallet" class="disconnect-btn" title="Disconnect Wallet">×</button>
                 </div>
             </div>
         </header>
