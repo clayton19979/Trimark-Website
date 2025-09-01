@@ -910,7 +910,7 @@ function disconnectWallet() {
     // Reset UI elements
     userPortrait.src = '';
     userName.textContent = '';
-    userAddress.textContent = 'No Role Assigned';
+    userAddress.textContent = 'Member';
     
     // Re-enable and reset button
     connectWalletBtn.disabled = false;
@@ -2572,55 +2572,56 @@ function initializeOreSites() {
             
             // System search functionality
             if (systemInput && systemSearchResults) {
-            // Function to search systems using the systems-data.js
-            function searchSystems(query) {
-                // Check if the searchSystems function from systems-data.js is available
-                if (typeof window.searchSystems === 'function') {
-                    const results = window.searchSystems(query);
-                    displaySystemSearchResults(results);
-                } else {
-                    // Fallback to local search if systems-data.js is not loaded
-                    const results = localSearchSystems(query);
-                    displaySystemSearchResults(results);
+                // Function to search systems using the systems-data.js
+                function searchSystems(query) {
+                    // Check if the searchSystems function from systems-data.js is available
+                    if (typeof window.searchSystems === 'function') {
+                        const results = window.searchSystems(query);
+                        displaySystemSearchResults(results);
+                    } else {
+                        // Fallback to local search if systems-data.js is not loaded
+                        const results = localSearchSystems(query);
+                        displaySystemSearchResults(results);
+                    }
                 }
-            }
-            
-            // Local fallback search function
-            function localSearchSystems(query) {
-                const queryLower = query.toLowerCase();
-                const systems = [
-                    "Jita", "Amarr", "Dodixie", "Rens", "Hek", "Perimeter", "Urlen", "Maurasi", "Sasta", "Tama", "Rancer", "Eha"
-                ];
                 
-                return systems
-                    .filter(system => system.toLowerCase().includes(queryLower))
-                    .map(system => ({ name: system, id: system.toLowerCase().replace(/\s+/g, '_') }))
-                    .slice(0, 10);
-            }
-            
-            function displaySystemSearchResults(results) {
-                if (results.length === 0) {
-                    systemSearchResults.innerHTML = '<div class="system-search-item">No systems found</div>';
-                } else {
-                    systemSearchResults.innerHTML = results.map(system => `
-                        <div class="system-search-item" data-system-name="${system.name}">
-                            <span class="system-name">${system.name}</span>
-                            <span class="system-id">ID: ${system.id}</span>
-                        </div>
-                    `).join('');
+                // Local fallback search function
+                function localSearchSystems(query) {
+                    const queryLower = query.toLowerCase();
+                    const systems = [
+                        "Jita", "Amarr", "Dodixie", "Rens", "Hek", "Perimeter", "Urlen", "Maurasi", "Sasta", "Tama", "Rancer", "Eha"
+                    ];
                     
-                    // Add click handlers for system selection
-                    systemSearchResults.querySelectorAll('.system-search-item').forEach(item => {
-                        item.addEventListener('click', function() {
-                            const systemName = this.dataset.systemName;
-                            systemInput.value = systemName;
-                            systemSearchResults.classList.add('hidden');
-                        });
-                    });
+                    return systems
+                        .filter(system => system.toLowerCase().includes(queryLower))
+                        .map(system => ({ name: system, id: system.toLowerCase().replace(/\s+/g, '_') }))
+                        .slice(0, 10);
                 }
                 
-                systemSearchResults.classList.remove('hidden');
-            }
+                function displaySystemSearchResults(results) {
+                    if (results.length === 0) {
+                        systemSearchResults.innerHTML = '<div class="system-search-item">No systems found</div>';
+                    } else {
+                        systemSearchResults.innerHTML = results.map(system => `
+                            <div class="system-search-item" data-system-name="${system.name}">
+                                <span class="system-name">${system.name}</span>
+                                <span class="system-id">ID: ${system.id}</span>
+                            </div>
+                        `).join('');
+                        
+                        // Add click handlers for system selection
+                        systemSearchResults.querySelectorAll('.system-search-item').forEach(item => {
+                            item.addEventListener('click', function() {
+                                const systemName = this.dataset.systemName;
+                                systemInput.value = systemName;
+                                systemSearchResults.classList.add('hidden');
+                            });
+                        });
+                    }
+                    
+                    systemSearchResults.classList.remove('hidden');
+                }
+                
                 systemInput.addEventListener('input', function() {
                     const query = this.value.trim();
                     if (query.length >= 2) {
@@ -3144,7 +3145,7 @@ function showWelcomeScreen(userName, userPortrait, userRole) {
                 </div>
                 <div class="welcome-message">
                     <p>Welcome back, Commander! You have successfully accessed the Trimark Industries portal.</p>
-                    <p>Your role: <strong>${userRole ? userRole.name : 'No Role Assigned'}</strong></p>
+                    <p>Your role: <strong>${userRole ? userRole.name : 'Member'}</strong></p>
                     <p>Click anywhere outside this message to continue to the site.</p>
                 </div>
             </div>

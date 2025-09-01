@@ -1825,6 +1825,162 @@ body {
     .welcome-user-details {
         text-align: center;
     }
+
+    /* Welcome screen responsive styles */
+    .welcome-screen .welcome-content {
+        padding: 30px 20px;
+        margin: 20px;
+    }
+    
+    .welcome-screen .welcome-header h2 {
+        font-size: 2rem;
+    }
+    
+    .welcome-screen .welcome-user-info {
+        flex-direction: column;
+        text-align: center;
+        gap: 20px;
+    }
+    
+    .welcome-screen .welcome-user-details {
+        text-align: center;
+    }
+    
+    .welcome-screen .welcome-portrait {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .welcome-screen .welcome-user-name {
+        font-size: 1.5rem;
+    }
+    
+    .continue-btn {
+        padding: 15px 30px;
+        font-size: 1.1rem;
+    }
+}
+
+/* Welcome Screen Styles for Landing Page */
+.welcome-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    backdrop-filter: blur(15px);
+}
+
+.welcome-screen .welcome-content {
+    background: linear-gradient(135deg, rgba(26, 26, 46, 0.98), rgba(0, 0, 0, 0.95));
+    border: 3px solid rgba(0, 212, 255, 0.6);
+    border-radius: 25px;
+    padding: 50px;
+    max-width: 600px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
+    animation: welcomeSlideIn 0.6s ease-out;
+}
+
+.welcome-screen .welcome-header h2 {
+    color: #00d4ff;
+    font-size: 2.5rem;
+    margin: 0 0 30px 0;
+    font-family: 'Orbitron', monospace;
+    text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+}
+
+.welcome-screen .welcome-user-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 25px;
+    margin-bottom: 35px;
+}
+
+.welcome-screen .welcome-portrait {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 4px solid rgba(0, 212, 255, 0.6);
+    box-shadow: 0 0 25px rgba(0, 212, 255, 0.3);
+}
+
+.welcome-screen .welcome-user-details {
+    text-align: left;
+}
+
+.welcome-screen .welcome-user-name {
+    color: #fff;
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    display: block;
+    font-family: 'Orbitron', monospace;
+}
+
+.welcome-screen .welcome-user-role {
+    color: #00d4ff;
+    font-size: 1.3rem;
+    font-weight: 500;
+    font-family: 'Exo 2', sans-serif;
+}
+
+.welcome-screen .welcome-message {
+    color: #ccc;
+    line-height: 1.7;
+    margin-bottom: 35px;
+}
+
+.welcome-screen .welcome-message p {
+    margin-bottom: 18px;
+    font-size: 1.1rem;
+}
+
+.welcome-screen .welcome-message strong {
+    color: #00d4ff;
+    font-weight: 600;
+}
+
+.continue-btn {
+    background: linear-gradient(135deg, #00d4ff, #0099cc);
+    border: none;
+    color: #fff;
+    padding: 18px 40px;
+    border-radius: 50px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 25px rgba(0, 212, 255, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0 auto;
+}
+
+.continue-btn:hover {
+    background: linear-gradient(135deg, #00b8e6, #0088b3);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 35px rgba(0, 212, 255, 0.4);
+}
+
+.continue-btn:active {
+    transform: translateY(0);
+}
+
+.continue-btn .btn-icon {
+    font-size: 1.4rem;
+}
+
+.continue-btn .btn-text {
+    font-family: 'Orbitron', monospace;
 }
 
 /* Responsive Design for Members */
