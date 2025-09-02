@@ -48,9 +48,42 @@ let userRoles = {}; // Will now store arrays of roles for each user
 
 // No hardcoded administrators - roles are assigned through the system
 
+// Load user roles from localStorage
+function loadUserRolesFromStorage() {
+    const storedRoles = localStorage.getItem('trimark_user_roles');
+    if (storedRoles) {
+        try {
+            userRoles = JSON.parse(storedRoles);
+            console.log('✅ Loaded user roles from localStorage:', userRoles);
+        } catch (error) {
+            console.error('❌ Error parsing user roles from localStorage:', error);
+            userRoles = {};
+        }
+    } else {
+        console.log('ℹ️ No user roles found in localStorage, starting with empty object');
+        
+        // Add some test data if no roles exist (for testing purposes)
+        if (Object.keys(userRoles).length === 0) {
+            console.log('🧪 Adding test role data for demonstration...');
+            userRoles = {
+                'Spitzhacke': ['administrator', 'event_coordinator'],
+                'TestUser1': ['diplomatic_officer'],
+                'TestUser2': ['lead_tactician', 'field_survey_lead']
+            };
+            localStorage.setItem('trimark_user_roles', JSON.stringify(userRoles));
+            console.log('✅ Test role data added:', userRoles);
+        } else {
+            console.log('📋 Using existing role data from localStorage:', userRoles);
+        }
+    }
+}
+
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM loaded, initializing app...');
+    
+    // Load user roles from localStorage
+    loadUserRolesFromStorage();
     
     // Initialize DOM elements
     connectWalletBtn = document.getElementById('connectWallet');
@@ -111,6 +144,18 @@ document.addEventListener('DOMContentLoaded', function() {
         // Initialize page-specific functionality
         initializePageSpecificFunctions();
         
+        // Debug: Check what role elements exist on the page
+        setTimeout(() => {
+            const allRoleTypes = document.querySelectorAll('.role-type');
+            const clickableRoleTypes = document.querySelectorAll('.role-type.clickable');
+            console.log('🔍 Debug: Found role elements:', {
+                total: allRoleTypes.length,
+                clickable: clickableRoleTypes.length,
+                allElements: allRoleTypes,
+                clickableElements: clickableRoleTypes
+            });
+        }, 2000);
+        
     }, 1000);
 });
 
@@ -121,10 +166,10 @@ function initializePageSpecificFunctions() {
     
     if (currentPage === 'roles.html' || window.location.href.includes('roles.html')) {
         console.log('Initializing Roles page...');
+        console.log('🔍 Current page detected as roles.html');
         loadTribeMembers();
-        setupPlayerSearch();
-        setupRoleManagement();
-        // checkAdminStatus(); // Removed for testing - everyone can assign roles
+        setupRolesDisplay();
+        // Role assignment moved to members page
     }
     
     if (currentPage === 'members.html' || window.location.href.includes('members.html')) {
@@ -132,12 +177,57 @@ function initializePageSpecificFunctions() {
         loadTribeMembers();
         renderMembersList();
         setupMembersPageEventListeners();
+        setupRoleAssignment(); // Add role assignment functionality to members page
     }
     
     if (currentPage === 'ore-sites.html' || window.location.href.includes('ore-sites.html')) {
         console.log('Initializing Ore Sites page...');
         // Ore sites functionality is handled by the embedded script in ore-sites.html
     }
+}
+
+// Get role display information
+function getRoleDisplayInfo(role) {
+    const roleInfo = {
+        'administrator': {
+            display: '👑 Administrator',
+            name: 'Administrator'
+        },
+        'diplomatic_officer': {
+            display: '🤝 Diplomatic Officer',
+            name: 'Diplomatic Officer'
+        },
+        'lead_tactician': {
+            display: '⚔️ Lead Tactician',
+            name: 'Lead Tactician'
+        },
+        'field_survey_lead': {
+            display: '🔍 Field Survey Lead',
+            name: 'Field Survey Lead'
+        },
+        'recruiter': {
+            display: '📢 Recruiter',
+            name: 'Recruiter'
+        },
+        'ambassador': {
+            display: '🌐 Ambassador',
+            name: 'Ambassador'
+        },
+        'crew_member': {
+            display: '👥 Crew Member',
+            name: 'Crew Member'
+        },
+        'event_coordinator': {
+            display: '📅 Event Coordinator',
+            name: 'Event Coordinator'
+        },
+        'member': {
+            display: '👤 Member',
+            name: 'Member'
+        }
+    };
+    
+    return roleInfo[role] || roleInfo['member'];
 }
 
 // Load tribe members from API
@@ -167,11 +257,9 @@ async function loadTribeMembers() {
             memberCountDisplay.textContent = tribeMembers.length;
         }
         
-        // Setup player search with the loaded tribe members
-        setupPlayerSearch();
-        
-        // Render members page if we're on it
+        // Setup player search with the loaded tribe members (only for members page)
         if (window.location.pathname.includes('members.html')) {
+            setupPlayerSearch();
             renderMembersList();
         }
         
@@ -358,15 +446,29 @@ function renderMembersList() {
     // Render members
     membersList.innerHTML = tribeMembers.map(member => {
         return `
-            <div class="member-item" data-name="${member.name.toLowerCase()}">
+            <div class="member-item clickable" data-name="${member.name.toLowerCase()}" data-member="${member.name}">
                 <div class="member-avatar">${member.name.charAt(0).toUpperCase()}</div>
                 <div class="member-details">
                     <div class="member-name">${member.name}</div>
                     <div class="member-address">${member.address.slice(0, 6)}...${member.address.slice(-4)}</div>
+                    <div class="member-roles" id="member-roles-${member.name}">
+                        <!-- Member roles will be displayed here -->
+                    </div>
+                </div>
+                <div class="member-actions">
+                    <button class="assign-role-btn" onclick="showRoleAssignmentModal('${member.name}')" title="Assign role to ${member.name}">
+                        👑 Assign Role
+                    </button>
                 </div>
             </div>
         `;
     }).join('');
+    
+    // Display current roles for each member
+    displayMemberRoles();
+    
+    // Setup click handlers for role assignment
+    setupMemberRoleAssignment();
 }
 
 // Setup event listeners for the members page
@@ -472,6 +574,296 @@ function loadApprovedUsers() {
 function showMainContent() {
     console.log('Showing main content...');
     // Simplified content display
+}
+
+// Setup roles display for the roles page
+function setupRolesDisplay() {
+    console.log('Setting up roles display...');
+    
+    // Migrate role format if needed
+    migrateRoleFormat();
+    
+    // Debug: Check current userRoles state
+    console.log('🔍 Current userRoles after migration:', userRoles);
+    console.log('🔍 userRoles type:', typeof userRoles);
+    console.log('🔍 userRoles keys:', Object.keys(userRoles));
+    
+    // Wait a moment for DOM to be fully ready, then setup clickable role types
+    setTimeout(() => {
+        setupClickableRoles();
+    }, 100);
+    
+    // No need to load current roles display - this is now handled by clickable roles
+    console.log('✅ Roles display setup complete - click on any role box to see who holds it');
+}
+
+// Setup clickable role types
+function setupClickableRoles() {
+    const roleTypes = document.querySelectorAll('.role-type.clickable');
+    console.log(`🔍 Found ${roleTypes.length} clickable role types:`, roleTypes);
+    
+    if (roleTypes.length === 0) {
+        console.log('❌ No clickable role types found! Checking for .role-type elements...');
+        const allRoleTypes = document.querySelectorAll('.role-type');
+        console.log(`🔍 Found ${allRoleTypes.length} total .role-type elements:`, allRoleTypes);
+        
+        // Check if the clickable class is missing
+        allRoleTypes.forEach(roleType => {
+            if (!roleType.classList.contains('clickable')) {
+                console.log(`⚠️ Role type missing 'clickable' class:`, roleType);
+            }
+        });
+        return;
+    }
+    
+    roleTypes.forEach(roleType => {
+        const role = roleType.getAttribute('data-role');
+        console.log(`🎯 Setting up click handler for role: ${role}`);
+        
+        // Add a visual indicator that this is clickable
+        roleType.style.borderColor = 'rgba(0, 212, 255, 0.6)';
+        roleType.style.boxShadow = '0 0 10px rgba(0, 212, 255, 0.3)';
+        
+        roleType.addEventListener('click', function() {
+            console.log(`🖱️ Clicked on role: ${role}`);
+            toggleRoleHolders(role);
+        });
+    });
+    
+    console.log('✅ Clickable role setup complete');
+}
+
+// Toggle role holders display
+function toggleRoleHolders(role) {
+    console.log(`🔄 Toggling role holders for: ${role}`);
+    const holdersElement = document.getElementById(`holders-${role}`);
+    if (!holdersElement) {
+        console.log(`❌ Holders element not found for role: ${role}`);
+        return;
+    }
+    
+    console.log(`✅ Found holders element:`, holdersElement);
+    
+    // Check if holders are already loaded
+    if (holdersElement.querySelector('.role-holders-list')) {
+        // Toggle visibility
+        const list = holdersElement.querySelector('.role-holders-list');
+        const newDisplay = list.style.display === 'none' ? 'block' : 'none';
+        list.style.display = newDisplay;
+        console.log(`🔄 Toggled visibility to: ${newDisplay}`);
+        return;
+    }
+    
+    // Load and display holders for this role
+    console.log(`📋 Loading role holders for: ${role}`);
+    displayRoleHolders(role, holdersElement);
+}
+
+// Display role holders for a specific role
+function displayRoleHolders(role, holdersElement) {
+    console.log(`📋 Displaying role holders for: ${role}`);
+    console.log(`🔍 Current userRoles:`, userRoles);
+    
+    const holders = [];
+    
+    // Find all users with this role
+    for (const [userName, userRoleArray] of Object.entries(userRoles)) {
+        if (Array.isArray(userRoleArray) && userRoleArray.includes(role)) {
+            holders.push(userName);
+            console.log(`✅ Found user with role: ${userName} has ${role}`);
+        } else if (userRoleArray === role) {
+            // Handle old single-role format
+            holders.push(userName);
+            console.log(`✅ Found user with old format role: ${userName} has ${role}`);
+        }
+    }
+    
+    console.log(`📊 Total holders found: ${holders.length}`, holders);
+    
+    if (holders.length === 0) {
+        holdersElement.innerHTML = '<span class="holders-label">No one currently holds this role</span>';
+        console.log(`ℹ️ No holders found for role: ${role}`);
+        return;
+    }
+    
+    const holdersHTML = `
+        <div class="role-holders-list">
+            ${holders.map(userName => `
+                <div class="role-holder-item">
+                    <span class="role-holder-name">${userName}</span>
+                    <div class="role-holder-actions">
+                        <button onclick="removeRoleFromUser('${userName}', '${role}')" title="Remove ${role} from ${userName}">
+                            🗑️ Remove
+                        </button>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+    `;
+    
+    holdersElement.innerHTML = holdersHTML;
+    console.log(`✅ Role holders displayed for: ${role}`);
+}
+
+// Remove role from user (called from role holders display)
+function removeRoleFromUser(userName, role) {
+    if (confirm(`Are you sure you want to remove the "${role}" role from ${userName}?`)) {
+        deleteRole(userName, role);
+        // Refresh the role holders display
+        const holdersElement = document.getElementById(`holders-${role}`);
+        if (holdersElement) {
+            displayRoleHolders(role, holdersElement);
+        }
+    }
+}
+
+// Setup role assignment for the members page
+function setupRoleAssignment() {
+    console.log('Setting up role assignment on members page...');
+    
+    // Migrate role format if needed
+    migrateRoleFormat();
+    
+    // Add click handlers to member items for role assignment
+    setupMemberRoleAssignment();
+}
+
+// Setup member role assignment
+function setupMemberRoleAssignment() {
+    // This will be called after members are rendered
+    console.log('Member role assignment setup ready');
+}
+
+// Display roles for each member
+function displayMemberRoles() {
+    tribeMembers.forEach(member => {
+        const rolesElement = document.getElementById(`member-roles-${member.name}`);
+        if (rolesElement) {
+            const memberRoles = userRoles[member.name];
+            if (memberRoles && Array.isArray(memberRoles) && memberRoles.length > 0) {
+                const rolesHTML = memberRoles.map(role => {
+                    const roleInfo = getRoleDisplayInfo(role);
+                    return `<span class="member-role-badge">${roleInfo.display}</span>`;
+                }).join('');
+                rolesElement.innerHTML = rolesHTML;
+            } else if (memberRoles && !Array.isArray(memberRoles)) {
+                // Handle old single-role format
+                const roleInfo = getRoleDisplayInfo(memberRoles);
+                rolesElement.innerHTML = `<span class="member-role-badge">${roleInfo.display}</span>`;
+            } else {
+                rolesElement.innerHTML = '<span class="member-role-badge no-role">👤 Member</span>';
+            }
+        }
+    });
+}
+
+// Show role assignment modal
+function showRoleAssignmentModal(memberName) {
+    // Create modal HTML
+    const modalHTML = `
+        <div id="roleAssignmentModal" class="modal-overlay">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Assign Role to ${memberName}</h3>
+                    <button onclick="closeRoleAssignmentModal()" class="close-btn">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="modalRoleSelect">Select Role</label>
+                        <select id="modalRoleSelect" class="role-select">
+                            <option value="">Choose a role...</option>
+                            <option value="administrator">👑 Administrator</option>
+                            <option value="diplomatic_officer">🤝 Diplomatic Officer</option>
+                            <option value="lead_tactician">⚔️ Lead Tactician</option>
+                            <option value="field_survey_lead">🔍 Field Survey Lead</option>
+                            <option value="recruiter">📢 Recruiter</option>
+                            <option value="ambassador">🌐 Ambassador</option>
+                            <option value="crew_member">👥 Crew Member</option>
+                            <option value="event_coordinator">📅 Event Coordinator</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="modalRoleReason">Reason for Assignment</label>
+                        <textarea id="modalRoleReason" placeholder="Explain why this role is being assigned..." class="role-textarea"></textarea>
+                    </div>
+                    <div class="modal-actions">
+                        <button onclick="assignRoleToMember('${memberName}')" class="role-btn primary">Assign Role</button>
+                        <button onclick="closeRoleAssignmentModal()" class="role-btn secondary">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Add modal to page
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+}
+
+// Close role assignment modal
+function closeRoleAssignmentModal() {
+    const modal = document.getElementById('roleAssignmentModal');
+    if (modal) {
+        modal.remove();
+    }
+}
+
+// Assign role to member from modal
+function assignRoleToMember(memberName) {
+    const roleSelect = document.getElementById('modalRoleSelect');
+    const roleReason = document.getElementById('modalRoleReason');
+    
+    if (!roleSelect.value || !roleReason.value) {
+        alert('Please fill in all fields.');
+        return;
+    }
+    
+    // Check if user is a tribe member
+    const isTribeMember = tribeMembers.some(member => member.name === memberName);
+    if (!isTribeMember) {
+        alert('Only Trimark Industries tribe members can be assigned roles.');
+        return;
+    }
+    
+    // Assign the role (support multiple roles per user)
+    if (!userRoles[memberName]) {
+        userRoles[memberName] = [];
+    }
+    
+    // Check if user already has this role
+    if (userRoles[memberName].includes(roleSelect.value)) {
+        alert(`${memberName} already has the role "${roleSelect.value}".`);
+        return;
+    }
+    
+    // Add the new role
+    userRoles[memberName].push(roleSelect.value);
+    
+    // Save to localStorage
+    localStorage.setItem('trimark_user_roles', JSON.stringify(userRoles));
+    
+    // Log the assignment
+    const assignmentLog = {
+        id: 'role_' + Date.now(),
+        userName: memberName,
+        role: roleSelect.value,
+        reason: roleReason.value,
+        assignedBy: currentAccount || 'Unknown',
+        assignedAt: new Date().toLocaleString()
+    };
+    
+    // Save assignment log
+    const existingLogs = JSON.parse(localStorage.getItem('trimark_role_assignments') || '[]');
+    existingLogs.push(assignmentLog);
+    localStorage.setItem('trimark_role_assignments', JSON.stringify(existingLogs));
+    
+    // Close modal
+    closeRoleAssignmentModal();
+    
+    // Refresh member display
+    renderMembersList();
+    
+    alert(`Role "${roleSelect.value}" assigned to ${memberName} successfully!`);
+    console.log('✅ Role assigned:', assignmentLog);
 }
 
 // Helper function to migrate old single-role format to new multiple-role format
@@ -786,3 +1178,5 @@ console.log('🏛️ Tribe ID:', REQUIRED_TRIBE_ID);
 console.log('🧪 TESTING MODE: Anyone can assign/delete roles');
 console.log('📝 No hardcoded administrators - all roles assigned through system');
 console.log('🔀 MULTIPLE ROLES: Users can now hold multiple roles simultaneously');
+console.log('🎯 ROLE ASSIGNMENT: Moved to members page - click members to assign roles');
+console.log('👁️ ROLES DISPLAY: Roles page now shows clickable role boxes with holders');

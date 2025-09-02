@@ -74,6 +74,21 @@ body {
     padding: 0 20px;
     position: relative;
     z-index: 1;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Responsive container adjustments */
+@media (max-width: 768px) {
+    .container {
+        padding: 0 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 0 10px;
+    }
 }
 
 /* Header */
@@ -801,15 +816,19 @@ body {
 .dashboard-section {
     padding: 80px 0;
     background: rgba(0, 0, 0, 0.3);
+    min-height: 100vh; /* Ensure full height */
+    overflow: visible; /* Ensure no overflow issues */
 }
 
 .dashboard-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 30px;
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
+    min-height: 600px; /* Ensure enough height for 2 rows */
+    grid-template-rows: repeat(2, 1fr); /* Explicitly set 2 rows */
 }
 
 .dashboard-card {
@@ -821,6 +840,11 @@ body {
     transition: all 0.3s ease;
     text-decoration: none;
     color: inherit;
+    min-height: 200px; /* Ensure consistent card height */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 .dashboard-card:hover {
@@ -845,6 +869,31 @@ body {
 .dashboard-card p {
     color: #ccc;
     line-height: 1.6;
+}
+
+/* Responsive dashboard grid */
+@media (max-width: 1200px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(2, 1fr);
+        max-width: 900px;
+        min-height: 900px; /* Ensure enough height for 3 rows on medium screens */
+        grid-template-rows: repeat(3, 1fr); /* 3 rows for 2 columns */
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        max-width: 500px;
+        gap: 20px;
+        min-height: 1200px; /* Ensure enough height for 6 rows on mobile */
+        grid-template-rows: repeat(6, 1fr); /* 6 rows for 1 column */
+    }
+    
+    .dashboard-card {
+        padding: 25px;
+        min-height: 180px; /* Slightly smaller height on mobile */
+    }
 }
 
 /* About Section */
@@ -899,12 +948,26 @@ body {
 .roles-section {
     padding: 80px 0;
     background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.roles-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 20% 80%, rgba(0, 212, 255, 0.03) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(0, 212, 255, 0.03) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(0, 212, 255, 0.02) 0%, transparent 50%);
+    pointer-events: none;
 }
 
 .roles-content {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 60px;
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
@@ -915,30 +978,116 @@ body {
     font-size: 2rem;
     margin-bottom: 20px;
     font-family: 'Orbitron', monospace;
+    text-align: center;
 }
 
 .roles-info p {
     color: #b8c6db;
     font-size: 1.1rem;
     line-height: 1.6;
-    margin-bottom: 30px;
+    margin-bottom: 40px;
+    text-align: center;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .role-types {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+    max-width: 1000px;
+    margin: 0 auto;
+    justify-items: center;
 }
 
 .role-type {
     display: flex;
-    align-items: center;
-    gap: 15px;
-    padding: 15px;
-    background: rgba(0, 212, 255, 0.1);
+    flex-direction: column;
+    gap: 12px;
+    padding: 25px;
+    background: rgba(0, 212, 255, 0.08);
     border: 1px solid rgba(0, 212, 255, 0.3);
-    border-radius: 8px;
+    border-radius: 12px;
     transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    min-height: 140px;
+    width: 100%;
+    max-width: 350px;
+    text-align: center;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Staggered animation delays for role cards */
+.role-type:nth-child(1) { animation-delay: 0.1s; }
+.role-type:nth-child(2) { animation-delay: 0.2s; }
+.role-type:nth-child(3) { animation-delay: 0.3s; }
+.role-type:nth-child(4) { animation-delay: 0.4s; }
+.role-type:nth-child(5) { animation-delay: 0.5s; }
+.role-type:nth-child(6) { animation-delay: 0.6s; }
+.role-type:nth-child(7) { animation-delay: 0.7s; }
+.role-type:nth-child(8) { animation-delay: 0.8s; }
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 1200px) {
+    .role-types {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        max-width: 900px;
+    }
+}
+
+@media (max-width: 900px) {
+    .role-types {
+        grid-template-columns: repeat(2, 1fr);
+        max-width: 700px;
+        gap: 20px;
+    }
+    
+    .role-type {
+        max-width: 100%;
+        padding: 20px;
+        min-height: 130px;
+    }
+}
+
+@media (max-width: 768px) {
+    .role-types {
+        grid-template-columns: 1fr;
+        max-width: 500px;
+        gap: 20px;
+    }
+    
+    .role-type {
+        padding: 20px;
+        min-height: 120px;
+        max-width: 400px;
+    }
+}
+
+@media (max-width: 480px) {
+    .role-types {
+        gap: 15px;
+        max-width: 100%;
+    }
+    
+    .role-type {
+        padding: 18px;
+        min-height: 110px;
+    }
 }
 
 .role-type:hover {
@@ -946,20 +1095,218 @@ body {
     border-color: rgba(0, 212, 255, 0.5);
 }
 
-.role-icon {
+.role-type.clickable {
+    cursor: pointer;
+    user-select: none;
+}
+
+.role-type.clickable:hover {
+    background: rgba(0, 212, 255, 0.15);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(0, 212, 255, 0.25);
+    border-color: rgba(0, 212, 255, 0.6);
+}
+
+.role-type.clickable:active {
+    transform: translateY(0);
+}
+
+.role-holders {
+    margin-top: auto;
+    padding-top: 15px;
+    border-top: 1px solid rgba(0, 212, 255, 0.2);
+}
+
+.holders-label {
+    color: #00d4ff;
+    font-size: 0.9rem;
+    font-style: italic;
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+}
+
+.role-type:hover .holders-label {
+    opacity: 1;
+}
+
+.role-holders-list {
+    margin-top: 10px;
+}
+
+.role-holder-item {
+    background: rgba(0, 212, 255, 0.1);
+    border: 1px solid rgba(0, 212, 255, 0.3);
+    border-radius: 5px;
+    padding: 8px 12px;
+    margin: 5px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.role-holder-name {
+    color: #00d4ff;
+    font-weight: 500;
+}
+
+.role-holder-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.role-holder-actions button {
+    background: rgba(255, 107, 107, 0.2);
+    border: 1px solid rgba(255, 107, 107, 0.5);
+    color: #ff6b6b;
+    padding: 4px 8px;
+    border-radius: 3px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.role-holder-actions button:hover {
+    background: rgba(255, 107, 107, 0.3);
+    border-color: #ff6b6b;
+}
+
+/* Member Role Badges */
+.member-role-badge {
+    display: inline-block;
+    background: rgba(0, 212, 255, 0.2);
+    border: 1px solid rgba(0, 212, 255, 0.4);
+    border-radius: 15px;
+    padding: 4px 8px;
+    margin: 2px;
+    font-size: 0.8rem;
+    color: #00d4ff;
+    font-weight: 500;
+}
+
+.member-role-badge.no-role {
+    background: rgba(136, 136, 136, 0.2);
+    border-color: rgba(136, 136, 136, 0.4);
+    color: #888;
+}
+
+/* Member Actions */
+.member-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.assign-role-btn {
+    background: rgba(0, 212, 255, 0.2);
+    border: 1px solid rgba(0, 212, 255, 0.4);
+    color: #00d4ff;
+    padding: 6px 12px;
+    border-radius: 5px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.assign-role-btn:hover {
+    background: rgba(0, 212, 255, 0.3);
+    border-color: #00d4ff;
+}
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+}
+
+.modal-content {
+    background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+    border: 1px solid rgba(0, 212, 255, 0.3);
+    border-radius: 12px;
+    padding: 0;
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+}
+
+.modal-header h3 {
+    color: #00d4ff;
+    margin: 0;
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: #888;
     font-size: 1.5rem;
-    min-width: 30px;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.close-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.role-icon {
+    font-size: 2rem;
+    min-width: 40px;
+    margin-bottom: 5px;
+    filter: drop-shadow(0 0 8px rgba(0, 212, 255, 0.6));
+    transition: filter 0.3s ease;
+}
+
+.role-type:hover .role-icon {
+    filter: drop-shadow(0 0 12px rgba(0, 212, 255, 0.8));
 }
 
 .role-type span:nth-child(2) {
     color: #00d4ff;
     font-weight: 600;
-    min-width: 120px;
+    font-size: 1.1rem;
+    font-family: 'Orbitron', monospace;
+    margin-bottom: 5px;
 }
 
 .role-desc {
     color: #b8c6db;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    margin-bottom: 10px;
 }
 
 .roles-management h3 {
@@ -1141,10 +1488,20 @@ body {
     border-radius: 12px;
     padding: 20px;
     display: grid;
-    grid-template-columns: auto 1fr auto auto;
+    grid-template-columns: auto 1fr auto;
     gap: 20px;
     align-items: center;
     transition: all 0.3s ease;
+}
+
+.member-item.clickable {
+    cursor: pointer;
+}
+
+.member-item.clickable:hover {
+    background: rgba(0, 0, 0, 0.4);
+    border-color: rgba(0, 212, 255, 0.4);
+    transform: translateY(-2px);
 }
 
 .member-item:hover {

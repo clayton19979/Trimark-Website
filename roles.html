@@ -148,126 +148,74 @@
                         <p>Manage member roles, assign responsibilities, and control access to different areas of Trimark Industries operations.</p>
                         
                         <div class="role-types">
-                            <div class="role-type">
+                            <div class="role-type clickable" data-role="administrator">
                                 <span class="role-icon">👑</span>
                                 <span>Administrator</span>
                                 <span class="role-desc">Full access to all systems and member management</span>
+                                <div class="role-holders" id="holders-administrator">
+                                    <span class="holders-label">Click to see holders</span>
+                                </div>
                             </div>
-                            <div class="role-type">
+                            <div class="role-type clickable" data-role="diplomatic_officer">
                                 <span class="role-icon">🤝</span>
                                 <span>Diplomatic Officer</span>
                                 <span class="role-desc">Handle diplomacy, negotiations, and external relations</span>
+                                <div class="role-holders" id="holders-diplomatic_officer">
+                                    <span class="holders-label">Click to see holders</span>
+                                </div>
                             </div>
-                            <div class="role-type">
+                            <div class="role-type clickable" data-role="lead_tactician">
                                 <span class="role-icon">⚔️</span>
                                 <span>Lead Tactician</span>
                                 <span class="role-desc">Lead tactical operations and strategic combat planning</span>
+                                <div class="role-holders" id="holders-lead_tactician">
+                                    <span class="holders-label">Click to see holders</span>
+                                </div>
                             </div>
-                            <div class="role-type">
+                            <div class="role-type clickable" data-role="field_survey_lead">
                                 <span class="role-icon">🔍</span>
                                 <span>Field Survey Lead</span>
                                 <span class="role-desc">Lead exploration and resource assessment operations</span>
+                                <div class="role-holders" id="holders-field_survey_lead">
+                                    <span class="holders-label">Click to see holders</span>
+                                </div>
                             </div>
-                            <div class="role-type">
+                            <div class="role-type clickable" data-role="recruiter">
                                 <span class="role-icon">📢</span>
                                 <span>Recruiter</span>
                                 <span class="role-desc">Handle recruitment and member acquisition</span>
+                                <div class="role-holders" id="holders-recruiter">
+                                    <span class="holders-label">Click to see holders</span>
+                                </div>
                             </div>
-                            <div class="role-type">
+                            <div class="role-type clickable" data-role="ambassador">
                                 <span class="role-icon">🌐</span>
                                 <span>Ambassador</span>
                                 <span class="role-desc">Represent the corporation in public relations and community</span>
+                                <div class="role-holders" id="holders-ambassador">
+                                    <span class="holders-label">Click to see holders</span>
+                                </div>
                             </div>
-                            <div class="role-type">
+                            <div class="role-type clickable" data-role="crew_member">
                                 <span class="role-icon">👥</span>
                                 <span>Crew Member</span>
                                 <span class="role-desc">Basic operations, combat support, and general duties</span>
+                                <div class="role-holders" id="holders-crew_member">
+                                    <span class="holders-label">Click to see holders</span>
+                                </div>
                             </div>
-                            <div class="role-type">
+                            <div class="role-type clickable" data-role="event_coordinator">
                                 <span class="role-icon">📅</span>
                                 <span>Event Coordinator</span>
                                 <span class="role-desc">Schedule and manage corporation events and operations</span>
+                                <div class="role-holders" id="holders-event_coordinator">
+                                    <span class="holders-label">Click to see holders</span>
+                                </div>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="roles-management">
-                        <h3>Role Assignment</h3>
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                            <div style="color: #888; font-size: 0.9rem;">
-                                Tribe Members: <span id="tribeMemberCount" style="color: #00d4ff; font-weight: bold;">0</span>
-                            </div>
-                            <button onclick="refreshTribeMembers()" class="role-btn secondary" style="padding: 8px 16px; font-size: 0.9rem;">
-                                🔄 Refresh Members
-                            </button>
-                        </div>
-                        <div class="role-assignment-form">
-                            <div class="form-group">
-                                <label for="roleUserName">Character Name</label>
-                                <input type="text" id="roleUserName" placeholder="Enter character name" class="role-input">
-                                <small style="color: #888; font-size: 0.8rem; margin-top: 5px; display: block;">
-                                    Only Trimark Industries tribe members can be assigned roles. Start typing to see suggestions.
-                                </small>
 
-                            </div>
-                            <div class="form-group">
-                                <label for="roleSelect">Select Role</label>
-                                <select id="roleSelect" class="role-select">
-                                    <option value="">Choose a role...</option>
-                                    <option value="administrator">👑 Administrator</option>
-                                    <option value="diplomatic_officer">🤝 Diplomatic Officer</option>
-                                    <option value="lead_tactician">⚔️ Lead Tactician</option>
-                                    <option value="field_survey_lead">🔍 Field Survey Lead</option>
-                                    <option value="recruiter">📢 Recruiter</option>
-                                    <option value="ambassador">🌐 Ambassador</option>
-                                    <option value="crew_member">👥 Crew Member</option>
-                                    <option value="event_coordinator">📅 Event Coordinator</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="roleReason">Reason for Assignment</label>
-                                <textarea id="roleReason" placeholder="Explain why this role is being assigned..." class="role-textarea"></textarea>
-                            </div>
-                            <button id="assignRoleBtn" class="role-btn primary">Assign Role</button>
-                        </div>
-                        
-                        <div class="pending-approvals">
-                            <h4>Pending Role Approvals</h4>
-                            <div id="pendingApprovalsList" class="approvals-list">
-                                <!-- Pending approvals will be populated here -->
-                            </div>
-                        </div>
-                        
-                        <div class="current-roles">
-                            <h4>Current Role Assignments</h4>
-                            <div id="currentRolesList" class="roles-list">
-                                <!-- Current roles will be populated here -->
-                            </div>
-                        </div>
-                        
-                        <div class="role-request-form">
-                            <h4>Request a Role</h4>
-                            <p>Don't have the role you need? Submit a request for administrators to review.</p>
-                            <div class="form-group">
-                                <label for="requestRoleSelect">Role Requested</label>
-                                <select id="requestRoleSelect" class="role-select">
-                                    <option value="">Choose a role...</option>
-                                    <option value="diplomatic_officer">🤝 Diplomatic Officer</option>
-                                    <option value="lead_tactician">⚔️ Lead Tactician</option>
-                                    <option value="field_survey_lead">🔍 Field Survey Lead</option>
-                                    <option value="recruiter">📢 Recruiter</option>
-                                    <option value="ambassador">🌐 Ambassador</option>
-                                    <option value="crew_member">👥 Crew Member</option>
-                                    <option value="event_coordinator">📅 Event Coordinator</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="requestRoleReason">Why do you need this role?</label>
-                                <textarea id="requestRoleReason" placeholder="Explain your experience and why this role would benefit the corporation..." class="role-textarea"></textarea>
-                            </div>
-                            <button id="requestRoleBtn" class="role-btn secondary">Submit Request</button>
-                        </div>
-                    </div>
                 </div>
             </section>
         </main>

@@ -314,6 +314,41 @@
             flex: 1; /* Takes remaining space */
         }
         
+        /* Ore Type Filter Boxes */
+        .ore-type-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+        
+        .filter-box {
+            padding: 8px 16px;
+            background: rgba(26, 26, 46, 0.6);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 20px;
+            color: #b8c6db;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+        
+        .filter-box:hover {
+            background: rgba(0, 212, 255, 0.1);
+            border-color: rgba(0, 212, 255, 0.5);
+            color: #fff;
+            transform: translateY(-1px);
+        }
+        
+        .filter-box.active {
+            background: rgba(0, 212, 255, 0.2);
+            border-color: rgba(0, 212, 255, 0.6);
+            color: #00d4ff;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+        }
+        
         /* Responsive design for smaller screens */
         @media (max-width: 1200px) {
             .ore-sections-container {
@@ -329,6 +364,44 @@
             .view-section {
                 flex: none;
                 width: 100%;
+            }
+        }
+        
+        /* View Logs Button */
+        .view-logs-section {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(0, 212, 255, 0.2);
+        }
+        
+        .view-logs-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            color: #fff;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+        }
+        
+        .view-logs-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 212, 255, 0.4);
+            background: linear-gradient(135deg, #00e6ff, #00b3e6);
+        }
+        
+        @media (max-width: 768px) {
+            .ore-type-filters {
+                gap: 8px;
+            }
+            
+            .filter-box {
+                padding: 6px 12px;
+                font-size: 0.8rem;
             }
         }
     </style>
@@ -354,8 +427,9 @@
                 <a href="about.html" class="nav-link">About</a>
                 <a href="ore-sites.html" class="nav-link active">Ore Sites</a>
                 <a href="roles.html" class="nav-link">Roles</a>
-                <a href="events.html" class="nav-link">Events</a>
                 <a href="members.html" class="nav-link">Members</a>
+                <a href="events.html" class="nav-link">Events</a>
+                <a href="logs.html" class="nav-link">Logs</a>
             </nav>
         </header>
 
@@ -424,40 +498,27 @@
                     </div>
                     
                     <div class="ore-form">
-                        <div class="form-group">
-                            <label for="filterSystem">Filter by System:</label>
-                            <input type="text" id="filterSystem" class="form-input" placeholder="Type system name to filter...">
+                        <!-- Ore Type Filter Boxes -->
+                        <div class="ore-type-filters">
+                            <div class="filter-box active" data-ore-type="all">All Types</div>
+                            <div class="filter-box" data-ore-type="Common Ore">Common Ore</div>
+                            <div class="filter-box" data-ore-type="Carbonaceous Ore">Carbonaceous</div>
+                            <div class="filter-box" data-ore-type="Metal Rich Ore">Metal Rich</div>
+                            <div class="filter-box" data-ore-type="Deep-Core Metallic Ore">Deep-Core Metallic</div>
+                            <div class="filter-box" data-ore-type="Deep-Core Carbon Ore">Deep-Core Carbon</div>
+                            <div class="filter-box" data-ore-type="Core Aestasium">Core Aestasium</div>
+                            <div class="filter-box" data-ore-type="Core Hermetite">Core Hermetite</div>
+                            <div class="filter-box" data-ore-type="Crude Matter">Crude Matter</div>
+                            <div class="filter-box" data-ore-type="Special Materials">Special Materials</div>
                         </div>
-                        
-                        <div class="form-group">
-                            <label for="filterOreType">Filter by Ore Type:</label>
-                            <select id="filterOreType" class="form-select">
-                                <option value="">All Ore Types</option>
-                                <option value="Common Ore">Common Ore</option>
-                                <option value="Carbonaceous Ore">Carbonaceous Ore</option>
-                                <option value="Metal Rich Ore">Metal Rich Ore</option>
-                                <option value="Deep-Core Metallic Ore">Deep-Core Metallic Ore</option>
-                                <option value="Deep-Core Carbon Ore">Deep-Core Carbon Ore</option>
-                                <option value="Core Aestasium">Core Aestasium</option>
-                                <option value="Core Hermetite">Core Hermetite</option>
-                                <option value="Crude Matter">Crude Matter</option>
-                                <option value="Special Materials">Special Materials</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="filterReporter">Filter by Reporter:</label>
-                            <input type="text" id="filterReporter" class="form-input" placeholder="Type reporter name to filter...">
-                        </div>
-                        
-                                                 <div class="form-group">
-                             <button onclick="loadOreSites()" class="submit-btn">Load Ore Sites</button>
-                             <button onclick="clearFilters()" class="test-btn" style="margin-left: 10px;">Clear Filters</button>
-                             <a href="logs.html" class="test-btn" style="margin-left: 10px; text-decoration: none; display: inline-block; text-align: center;">View Logs</a>
-                         </div>
                         
                         <div id="oreSitesList" class="ore-sites-list">
                             <!-- Ore sites will be displayed here -->
+                        </div>
+                        
+                        <!-- View Logs Button -->
+                        <div class="view-logs-section">
+                            <a href="logs.html" class="view-logs-btn">📋 View Activity Logs</a>
                         </div>
                     </div>
                 </section>
@@ -621,34 +682,18 @@
         
 
         
+        // Global variable to track current filter
+        let currentOreTypeFilter = 'all';
+        
         // Load and display ore sites
         function loadOreSites() {
-            const filterSystem = document.getElementById('filterSystem').value.toLowerCase();
-            const filterOreType = document.getElementById('filterOreType').value;
-            const filterReporter = document.getElementById('filterReporter').value.toLowerCase();
-            
             // Get ore sites from localStorage
             const oreSites = JSON.parse(localStorage.getItem('trimark_ore_sites') || '[]');
             
-            // Apply filters
+            // Apply ore type filter
             let filteredSites = oreSites;
-            
-            if (filterSystem) {
-                filteredSites = filteredSites.filter(site => 
-                    site.system.toLowerCase().includes(filterSystem)
-                );
-            }
-            
-            if (filterOreType) {
-                filteredSites = filteredSites.filter(site => 
-                    site.oreType === filterOreType
-                );
-            }
-            
-            if (filterReporter) {
-                filteredSites = filteredSites.filter(site => 
-                    site.reporter && site.reporter.toLowerCase().includes(filterReporter)
-                );
+            if (currentOreTypeFilter !== 'all') {
+                filteredSites = oreSites.filter(site => site.oreType === currentOreTypeFilter);
             }
             
             // Sort by date (newest first)
@@ -724,17 +769,20 @@
             }
         }
         
-        // Clear all filters
-        function clearFilters() {
-            document.getElementById('filterSystem').value = '';
-            document.getElementById('filterOreType').value = '';
-            document.getElementById('filterReporter').value = '';
+        // Handle filter box clicks
+        function handleFilterClick(oreType) {
+            // Update active filter
+            currentOreTypeFilter = oreType;
+            
+            // Update active state of filter boxes
+            document.querySelectorAll('.filter-box').forEach(box => {
+                box.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Reload ore sites with new filter
             loadOreSites();
         }
-        
-
-        
-
         
         // Auto-load ore sites when page loads
         document.addEventListener('DOMContentLoaded', function() {
@@ -752,6 +800,14 @@
                 walletStatusText.textContent = 'Not connected - Please log in from landing page';
                 console.log('❌ No wallet connected');
             }
+            
+            // Set up filter box click handlers
+            document.querySelectorAll('.filter-box').forEach(box => {
+                box.addEventListener('click', function() {
+                    const oreType = this.getAttribute('data-ore-type');
+                    handleFilterClick(oreType);
+                });
+            });
             
             // Load ore sites after a short delay to ensure everything is initialized
             setTimeout(loadOreSites, 1000);
