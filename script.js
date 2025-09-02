@@ -3573,3 +3573,154 @@ function hideWalletGate() {
         footer.style.display = 'block';
     }
 }
+
+        // Complete the setupOreSitesEventListeners function
+        // System search input event listener
+        systemInput.addEventListener('input', function() {
+            const query = this.value.trim();
+            if (query.length >= 2) {
+                searchSystems(query);
+            } else {
+                systemSearchResults.classList.add('hidden');
+            }
+        });
+        
+        // Hide search results when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!systemInput.contains(e.target) && !systemSearchResults.contains(e.target)) {
+                systemSearchResults.classList.add('hidden');
+            }
+        });
+        
+        // Form submission handler
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                submitOreSiteReport();
+            });
+        }
+        
+        // Delete ore site functionality
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('delete-ore-site')) {
+                const siteId = e.target.dataset.id;
+                if (confirm('Are you sure you want to delete this ore site?')) {
+                    deleteOreSite(siteId);
+                }
+            }
+        });
+    }
+    
+    // Function to submit ore site report
+    function submitOreSiteReport() {
+        const formData = {
+            siteName: document.getElementById('siteName').value,
+            systemName: document.getElementById('systemName').value,
+            oreType: document.getElementById('oreType').value,
+            estimatedYield: document.getElementById('estimatedYield').value,
+            securityStatus: document.getElementById('securityStatus').value,
+            siteNotes: document.getElementById('siteNotes').value,
+            reportedBy: currentAccount,
+            reportedAt: new Date().toISOString()
+        };
+        
+        console.log('Submitting ore site report:', formData);
+        
+        // Add the new ore site to the list
+        const newOreSite = {
+            id: 'site_' + Date.now(),
+            name: formData.siteName,
+            system: formData.systemName,
+            oreType: formData.oreType,
+            yield: formData.estimatedYield + ' m³/hr',
+            security: formData.securityStatus,
+            status: 'Active',
+            notes: formData.siteNotes,
+            reportedBy: formData.reportedBy,
+            reportedAt: formData.reportedAt
+        };
+        
+        // Add to ore sites array
+        oreSites.push(newOreSite);
+        
+        // Update the display
+        displayOreSites();
+        
+        // Close modal and reset form
+        document.getElementById('reportOreSiteModal').classList.add('hidden');
+        document.getElementById('oreSiteForm').reset();
+        
+        // Show success message
+        showNotification('Ore site report submitted successfully!', 'success');
+    }
+    
+    // Notification function for user feedback
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <span class="notification-message">${message}</span>
+                <button class="notification-close">×</button>
+            `;
+            
+            // Add styles
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? '#4CAF50' : type === 'error' ? '#f44336' : '#2196F3'};
+                color: white;
+                padding: 15px 20px;
+                border-radius: 5px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 10000;
+                display: flex;
+                align-items: center;
+                gap: 15px;
+                max-width: 400px;
+                animation: slideInRight 0.3s ease-out;
+            `;
+            
+            // Add close button functionality
+            const closeBtn = notification.querySelector('.notification-close');
+            closeBtn.style.cssText = `
+                background: none;
+                border: none;
+                color: white;
+                font-size: 20px;
+                cursor: pointer;
+                padding: 0;
+                margin: 0;
+            `;
+            
+            closeBtn.addEventListener('click', () => {
+                notification.remove();
+            });
+            
+            // Add to page
+            document.body.appendChild(notification);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+        
+        // Add CSS animation for notifications
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+        `;
+        document.head.appendChild(style);

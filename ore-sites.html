@@ -6,95 +6,179 @@
     <title>Ore Sites - Trimark Industries</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js" type="application/javascript" onerror="loadEthersFallback()"></script>
+    <!-- Load the custom systems data instead of EVE Online systems -->
+    <script src="solar-systems-data.js"></script>
     <script>
-        function loadEthersFallback() {
-            console.log('Primary ethers CDN failed, trying fallback...');
-            const script = document.createElement('script');
-            script.src = 'https://unpkg.com/ethers@5.7.2/dist/ethers.umd.min.js';
-            script.onload = () => console.log('Fallback ethers loaded successfully');
-            script.onerror = () => console.error('All ethers CDNs failed');
-            document.head.appendChild(script);
-        }
-    </script>
-    <script src="https://unpkg.com/@metamask/detect-provider@2.0.0/dist/detect-provider.min.js"></script>
-    <script src="systems-data.js"></script>
-    <script>
-        // OneKey Wallet EIP-6963 Detection - Using official OneKey API pattern
-        let onekeyProvider = null;
+        // Global variables
+        let customSystems = [];
+        let allSystems = [];
+        let searchTimeout;
         
-        const onAnnounceProvider = (event) => {
-            // The event.detail contains the provider info and the provider object itself.
-            // event.detail = { info: { uuid, name, icon, rdns }, provider }
-            if (event.detail.info.name === 'OneKey') {
-                onekeyProvider = event.detail.provider;
-                console.log('✅ OneKey wallet detected via EIP-6963!');
-                
-                // Make it available globally
-                window.onekeyProvider = onekeyProvider;
-                
-                // Update button text if available
-                const connectBtn = document.getElementById('connectWallet');
-                if (connectBtn) {
-                    connectBtn.textContent = 'Connect OneKey Wallet';
-                    connectBtn.disabled = false;
-                }
-            }
-            // You can also store all providers in an array to let users choose.
-        };
-        
-        // Listen for the announcement event from all wallets
-        window.addEventListener('eip6963:announceProvider', onAnnounceProvider);
-        
-        // It's also good practice to dispatch a request event to prompt wallets
-        // that may have loaded after the initial page load.
-        window.dispatchEvent(new Event('eip6963:requestProvider'));
-        
-        // After a short delay, check if the onekeyProvider was found.
-        setTimeout(() => {
-            if (onekeyProvider) {
-                console.log('✅ OneKey wallet ready via EIP-6963!');
-                window.onekeyProvider = onekeyProvider;
-                
-                const connectBtn = document.getElementById('connectWallet');
-                if (connectBtn) {
-                    connectBtn.textContent = 'Connect OneKey Wallet';
-                    connectBtn.disabled = false;
-                }
-                
-                // Check if already connected
-                checkExistingOneKeyConnection();
-            } else {
-                console.log('❌ OneKey Wallet not found via EIP-6963. Please install it from onekey.so/download');
-                const connectBtn = document.getElementById('connectWallet');
-                if (connectBtn) {
-                    connectBtn.textContent = 'Install OneKey Wallet';
-                    connectBtn.disabled = false;
-                }
-            }
-        }, 500);
-        
-        // Check if OneKey wallet is already connected
-        async function checkExistingOneKeyConnection() {
-            if (!onekeyProvider) return;
-            
+        // Load systems from embedded JavaScript data
+        function loadSystems() {
             try {
-                console.log('🔍 Checking existing OneKey wallet connection via EIP-6963...');
-                const accounts = await onekeyProvider.request({ 
-                    method: 'eth_accounts' 
-                });
-                
-                if (accounts.length > 0) {
-                    console.log('✅ Found existing OneKey wallet connection via EIP-6963:', accounts[0]);
-                    // The main script.js will handle the connection state
+                if (customSystems && customSystems.length > 0) {
+                    allSystems = customSystems;
+                    console.log('✅ Loaded', allSystems.length, 'solar system names from embedded data');
+                    console.log('🔍 First 10 systems:', allSystems.slice(0, 10));
+                    console.log('🔍 Last 10 systems:', allSystems.slice(-10));
+                    
+                    // Check if H:1807 is in the list
+                    if (allSystems.includes('H:1807')) {
+                        console.log('✅ H:1807 found in systems list');
+                    } else {
+                        console.log('❌ H:1807 NOT found in systems list');
+                    }
                 } else {
-                    console.log('ℹ️ No existing OneKey wallet connection found');
+                    // Fallback systems
+                    allSystems = [
+                        "A 2560", "M 974", "U 3183", "O3H-1FN", "O9T-0FN", "UFC-3FN", 
+                        "OR7-5FN", "O71-4FN", "U2L-4FN", "OT4-2FN", "IMP-2FN", "E06-D68"
+                    ];
+                    console.log('ℹ️ Using fallback systems:', allSystems.length);
                 }
             } catch (error) {
-                console.error('❌ Error checking existing OneKey EIP-6963 connection:', error);
+                console.error('❌ Error loading solar system names:', error);
+                allSystems = ["A 2560", "M 974", "U 3183", "O3H-1FN", "O9T-0FN"];
             }
         }
+        
+        // Load custom systems from embedded JavaScript data
+        console.log('🚀 Starting to load solar system names from embedded data...');
+        
+        // Check if the solar systems data is available
+        if (typeof SOLAR_SYSTEMS !== 'undefined' && Array.isArray(SOLAR_SYSTEMS)) {
+            customSystems = SOLAR_SYSTEMS;
+            console.log('✅ Loaded solar system names:', customSystems.length);
+            console.log('🔍 Sample systems:', customSystems.slice(0, 10));
+            console.log('🔍 Checking for H:1807:', customSystems.includes('H:1807'));
+            
+            // Now that systems are loaded, initialize the search functionality
+            loadSystems();
+        } else {
+            console.error('❌ SOLAR_SYSTEMS not found or not an array');
+            // Fallback to some basic systems
+            customSystems = ["A 2560", "M 974", "U 3183", "O3H-1FN", "O9T-0FN"];
+            console.log('🔄 Using fallback systems:', customSystems);
+            
+            // Initialize with fallback systems
+            loadSystems();
+        }
     </script>
+    <style>
+        /* Simple Search Styles */
+        .search-container {
+            position: relative;
+            margin: 20px 0;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(26, 26, 46, 0.9);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+        }
+        
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #1a1a2e;
+            border: 1px solid #00d4ff;
+            border-radius: 5px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .search-result-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+            color: #fff;
+        }
+        
+        .search-result-item:hover {
+            background: rgba(0, 212, 255, 0.1);
+        }
+        
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+        
+        .ore-form {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background: rgba(26, 26, 46, 0.8);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 15px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            color: #00d4ff;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(26, 26, 46, 0.9);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+        }
+        
+        .form-select {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(26, 26, 46, 0.9);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+        }
+        
+        .submit-btn {
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            border: none;
+            color: #fff;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            width: 100%;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 212, 255, 0.4);
+        }
+        
+        .test-btn {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            border: none;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+    </style>
 </head>
 <body>
     <div class="stars"></div>
@@ -120,235 +204,265 @@
                 <a href="events.html" class="nav-link">Events</a>
                 <a href="members.html" class="nav-link">Members</a>
             </nav>
-
-            <div class="wallet-section">
-                <button id="connectWallet" class="wallet-btn">
-                    <span class="wallet-icon">🔗</span>
-                    Connect Wallet
-                </button>
-
-                <div id="userProfile" class="user-profile hidden">
-                    <img id="userPortrait" src="" alt="Character Portrait" class="user-portrait">
-                    <div class="user-info">
-                        <span id="userName" class="user-name"></span>
-                        <span id="userAddress" class="user-address"></span>
-                    </div>
-                    <button id="disconnectWallet" class="disconnect-btn">×</button>
-                </div>
-            </div>
         </header>
 
-
-
-    <!-- Report Ore Site Modal -->
-    <div id="reportOreSiteModal" class="admin-modal hidden">
-        <div class="admin-modal-content">
-            <div class="admin-modal-header">
-                <h2>⛏️ Report New Ore Site</h2>
-                <button id="closeReportModal" class="close-btn">×</button>
-            </div>
-            <div class="admin-modal-body">
-                <div class="admin-section">
-                    <form id="oreSiteForm">
-                        <div class="form-group">
-                            <label for="siteName">Site Name:</label>
-                            <input type="text" id="siteName" required class="admin-input">
-                        </div>
-                        <div class="form-group">
-                            <label for="systemName">System:</label>
-                            <input type="text" id="systemName" required class="admin-input" placeholder="Start typing to search systems...">
-                            <div id="systemSearchResults" class="system-search-results hidden"></div>
-                        </div>
-                        <div class="form-group">
-                            <label for="oreType">Ore Type:</label>
-                            <select id="oreType" required class="admin-input">
-                                <option value="">Select Ore Type</option>
-                                <option value="Common Ore">Common Ore</option>
-                                <option value="Carbonaceous Ore">Carbonaceous Ore</option>
-                                <option value="Metal Rich Ore">Metal Rich Ore</option>
-                                <option value="Deep-Core Metallic Ore">Deep-Core Metallic Ore</option>
-                                <option value="Deep-Core Carbon Ore">Deep-Core Carbon Ore</option>
-                                <option value="Core Aestasium">Core Aestasium</option>
-                                <option value="Core Hermetite">Core Hermetite</option>
-                                <option value="Crude Matter">Crude Matter</option>
-                                <option value="Special Materials">Special Materials</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="estimatedYield">Estimated Yield (m³/hr):</label>
-                            <input type="number" id="estimatedYield" required class="admin-input">
-                        </div>
-                        <div class="form-group">
-                            <label for="securityStatus">Security Status:</label>
-                            <select id="securityStatus" required class="admin-input">
-                                <option value="">Select Security</option>
-                                <option value="High (0.5-1.0)">High (0.5-1.0)</option>
-                                <option value="Medium (0.1-0.4)">Medium (0.1-0.4)</option>
-                                <option value="Low (0.0)">Low (0.0)</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="siteNotes">Additional Notes:</label>
-                            <textarea id="siteNotes" class="admin-input" rows="3" placeholder="Any additional information about the site..."></textarea>
-                        </div>
-                        <div class="form-actions">
-                            <button type="submit" class="admin-btn">Submit Report</button>
-                            <button type="button" id="cancelReport" class="admin-btn secondary">Cancel</button>
-                        </div>
-                    </form>
+        <main class="main-content">
+            <section class="ore-section">
+                <div class="ore-header">
+                    <h2 class="section-title">⛏️ Report New Ore Site</h2>
+                    <p class="section-subtitle">Help expand our mining operations by reporting new ore sites you discover.</p>
                 </div>
-            </div>
-        </div>
+                
+                <div class="ore-form">
+                                         <form id="oreSiteForm">
+                         <div class="form-group">
+                             <label for="systemName">System Name:</label>
+                             <div class="search-container">
+                                 <input type="text" id="systemName" class="search-input" placeholder="Type to search for systems..." autocomplete="off">
+                                 <div id="searchResults" class="search-results"></div>
+                             </div>
+                         </div>
+                         
+                         <div class="form-group">
+                             <label for="oreType">Ore Type:</label>
+                             <select id="oreType" class="form-select" required>
+                                 <option value="">Select Ore Type</option>
+                                 <option value="Common Ore">Common Ore</option>
+                                 <option value="Carbonaceous Ore">Carbonaceous Ore</option>
+                                 <option value="Metal Rich Ore">Metal Rich Ore</option>
+                                 <option value="Deep-Core Metallic Ore">Deep-Core Metallic Ore</option>
+                                 <option value="Deep-Core Carbon Ore">Deep-Core Carbon Ore</option>
+                                 <option value="Core Aestasium">Core Aestasium</option>
+                                 <option value="Core Hermetite">Core Hermetite</option>
+                                 <option value="Crude Matter">Crude Matter</option>
+                                 <option value="Special Materials">Special Materials</option>
+                             </select>
+                         </div>
+                         
+                         <div class="form-group">
+                             <label for="siteNotes">Additional Notes:</label>
+                             <textarea id="siteNotes" class="form-input" rows="3" placeholder="Any additional information about the site..."></textarea>
+                         </div>
+                         
+                         <div class="form-group">
+                             <button type="submit" class="submit-btn">Submit Report</button>
+                         </div>
+                     </form>
+                     
+                     <div style="text-align: center; margin-top: 20px;">
+                         <button onclick="showAllSystems()" class="test-btn">Show All Systems</button>
+                         <button onclick="testSystemLoading()" class="test-btn">Test System Loading</button>
+                     </div>
+                 </div>
+             </section>
+             
+             <!-- View Submitted Ore Sites Section -->
+             <section class="ore-section" style="margin-top: 40px;">
+                 <div class="ore-header">
+                     <h2 class="section-title">📋 View Submitted Ore Sites</h2>
+                     <p class="section-subtitle">Browse and manage all reported ore sites.</p>
+                 </div>
+                 
+                 <div class="ore-form">
+                     <div class="form-group">
+                         <label for="filterSystem">Filter by System:</label>
+                         <input type="text" id="filterSystem" class="form-input" placeholder="Type system name to filter...">
+                     </div>
+                     
+                     <div class="form-group">
+                         <label for="filterOreType">Filter by Ore Type:</label>
+                         <select id="filterOreType" class="form-select">
+                             <option value="">All Ore Types</option>
+                             <option value="Common Ore">Common Ore</option>
+                             <option value="Carbonaceous Ore">Carbonaceous Ore</option>
+                             <option value="Metal Rich Ore">Metal Rich Ore</option>
+                             <option value="Deep-Core Metallic Ore">Deep-Core Metallic Ore</option>
+                             <option value="Deep-Core Carbon Ore">Deep-Core Carbon Ore</option>
+                             <option value="Core Aestasium">Core Aestasium</option>
+                             <option value="Core Hermetite">Core Hermetite</option>
+                             <option value="Crude Matter">Crude Matter</option>
+                             <option value="Special Materials">Special Materials</option>
+                         </select>
+                     </div>
+                     
+                     <div class="form-group">
+                         <button onclick="loadOreSites()" class="submit-btn">Load Ore Sites</button>
+                         <button onclick="clearFilters()" class="test-btn" style="margin-left: 10px;">Clear Filters</button>
+                     </div>
+                     
+                     <div id="oreSitesList" class="ore-sites-list">
+                         <!-- Ore sites will be displayed here -->
+                     </div>
+                 </div>
+                </div>
+            </section>
+        </main>
     </div>
 
-    <main class="main-content">
-        <section id="ore-sites" class="mining-sites-section">
-            <div class="mining-sites-header">
-                <h2 class="section-title">Ore Sites</h2>
-                <p class="section-subtitle">Real-time status of active extraction operations, resource yields, and security conditions across our mining territories.</p>
-                <button id="reportNewSite" class="cta-btn report-site">⛏️ Report New Site</button>
-            </div>
-            
-            <div class="mining-sites-content">
-                <div class="mining-sites-filters">
-                    <input type="text" id="oreSiteSearch" placeholder="Search ore sites..." class="mining-search-input">
-                    <select id="oreSiteFilter" class="mining-filter-select">
-                        <option value="all">All Sites</option>
-                        <option value="active">Active Only</option>
-                        <option value="high-sec">High Security</option>
-                        <option value="low-sec">Low Security</option>
-                        <option value="null-sec">Null Security</option>
-                    </select>
-                    <select id="oreSiteSort" class="mining-sort-select">
-                        <option value="name">Sort by Name</option>
-                        <option value="yield">Sort by Yield</option>
-                        <option value="security">Sort by Security</option>
-                        <option value="status">Sort by Status</option>
-                    </select>
-                </div>
-                
-                <div class="mining-sites-stats">
-                    <div class="stat-card">
-                        <span class="stat-number" id="totalSites">0</span>
-                        <span class="stat-label">Total Sites</span>
-                    </div>
-                    <div class="stat-card">
-                        <span class="stat-number" id="activeSites">0</span>
-                        <span class="stat-label">Active Sites</span>
-                    </div>
-                </div>
-                
-                <div id="oreSitesList" class="mining-sites-list">
-                    <!-- Ore sites will be populated here -->
-                </div>
-            </div>
-        </section>
-    </main>
-    </div>
-
-    <!-- Hidden Canvas Element for The Architect's Signature -->
-    <canvas id="hiddenCanvas" width="100" height="100" style="display: none; position: absolute; left: -9999px; top: -9999px; width: 0; height: 0;"></canvas>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="footer-content">
-            <div class="footer-section">
-                <h3>Quick Links</h3>
-                <a href="index.html">Home</a>
-                <a href="about.html">About</a>
-                <a href="ore-sites.html">Ore Sites</a>
-                <a href="roles.html">Roles</a>
-                <a href="events.html">Events</a>
-                <a href="members.html">Members</a>
-            </div>
-            <div class="footer-section">
-                <p>&copy; 2024 Trimark Industries. All rights reserved.</p>
-            </div>
-        </div>
-        
-        <!-- The Architect's Signature - Hidden in footer -->
-        <div class="architect-signature">
-            <svg class="animate-pulse-slow" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <!-- The central, perfect triangle representing the unified universe -->
-                <path d="M50 5 L95 95 H5 L50 5 Z" stroke="#00F8FF" stroke-width="2" />
-                
-                <!-- Fragmentation lines, symbolizing the shattering of reality -->
-                <line x1="50" y1="5" x2="50" y2="30" stroke="#00F8FF" stroke-width="1.5" />
-                <line x1="50" y1="50" x2="50" y2="70" stroke="#00F8FF" stroke-width="1.5" />
-
-                <line x1="5" y1="95" x2="30" y2="95" stroke="#00F8FF" stroke-width="1.5" />
-                <line x1="70" y1="95" x2="95" y2="95" stroke="#00F8FF" stroke-width="1.5" />
-
-                <line x1="50" y1="50" x2="75" y2="75" stroke="#00F8FF" stroke-width="1.5" />
-                <line x1="50" y1="50" x2="25" y2="75" stroke="#00F8FF" stroke-width="1.5" />
-                
-                <!-- Central point of purpose or "eye" of the Architect -->
-                <circle cx="50" cy="50" r="4" fill="#00F8FF" />
-            </svg>
-        </div>
-    </footer>
-
-    <script src="script.js"></script>
     <script>
-        // Ensure wallet connection works on this page
+        // Initialize when page loads
         document.addEventListener('DOMContentLoaded', function() {
-            // Wait for script.js to load and initialize
-            setTimeout(() => {
-                // Check if the wallet connection is working
-                const connectWalletBtn = document.getElementById('connectWallet');
-                if (connectWalletBtn) {
-                    console.log('✅ Connect wallet button found on Ore Sites page');
+            console.log('🚀 Initializing ore site system...');
+            
+            // Set up search input
+            const systemInput = document.getElementById('systemName');
+            const searchResults = document.getElementById('searchResults');
+            
+            if (systemInput && searchResults) {
+                // Search as user types
+                systemInput.addEventListener('input', function() {
+                    const query = this.value.trim();
                     
-                    // Add click event listener if not already added
-                    if (!connectWalletBtn.hasAttribute('data-listener-added')) {
-                        connectWalletBtn.addEventListener('click', async function() {
-                            console.log('🔌 Connect wallet clicked on Ore Sites page');
-                            
-                            try {
-                                // Try to use OneKey wallet first if available via EIP-6963
-                                if (window.onekeyProvider) {
-                                    console.log('🔌 Using OneKey wallet provider via EIP-6963');
-                                    const accounts = await window.onekeyProvider.request({ 
-                                        method: 'eth_requestAccounts' 
-                                    });
-                                    
-                                    if (accounts.length > 0) {
-                                        console.log('✅ OneKey wallet connected via EIP-6963:', accounts[0]);
-                                        // Call the global connectWallet function
-                                        if (typeof window.connectWallet === 'function') {
-                                            window.connectWallet();
-                                        } else {
-                                            console.error('❌ connectWallet function not found');
-                                        }
-                                    }
-                                } else if (typeof window.connectWallet === 'function') {
-                                    console.log('🔌 Using fallback connectWallet function');
-                                    window.connectWallet();
-                                } else {
-                                    console.error('❌ No wallet provider or connectWallet function available');
-                                    alert('No wallet provider available. Please install OneKey Wallet or MetaMask!');
-                                }
-                            } catch (error) {
-                                console.error('❌ Error connecting wallet:', error);
-                                alert('Failed to connect wallet: ' + error.message);
-                            }
-                        });
-                        connectWalletBtn.setAttribute('data-listener-added', 'true');
+                    // Clear previous timeout
+                    if (searchTimeout) {
+                        clearTimeout(searchTimeout);
                     }
-                } else {
-                    console.error('❌ Connect wallet button not found on Ore Sites page');
-                }
+                    
+                    // Search after user stops typing for 300ms
+                    searchTimeout = setTimeout(() => {
+                        performSearch(query);
+                    }, 300);
+                });
                 
-                // Check if OneKey wallet detection is working
-                if (typeof window.initializeOneKeyWallet === 'function') {
-                    console.log('✅ OneKey wallet detection available via EIP-6963');
-                    // Initialize OneKey wallet detection
-                    window.initializeOneKeyWallet();
-                } else {
-                    console.error('❌ OneKey wallet detection not available');
-                }
-            }, 1000);
+                // Hide results when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!systemInput.contains(e.target) && !searchResults.contains(e.target)) {
+                        searchResults.style.display = 'none';
+                    }
+                });
+            }
+            
+            // Set up form submission
+            const form = document.getElementById('oreSiteForm');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const systemName = document.getElementById('systemName').value;
+                    const oreType = document.getElementById('oreType').value;
+                    const notes = document.getElementById('siteNotes').value;
+                    
+                    if (!systemName || !oreType) {
+                        alert('Please fill in all required fields.');
+                        return;
+                    }
+                    
+                    // Check if system exists
+                    if (!allSystems.includes(systemName)) {
+                        alert('Please select a valid system from the search results.');
+                        return;
+                    }
+                    
+                    // Create ore site
+                    const oreSite = {
+                        id: 'ore_' + Date.now(),
+                        system: systemName,
+                        oreType: oreType,
+                        notes: notes || 'No additional notes.',
+                        reportedAt: new Date().toLocaleString()
+                    };
+                    
+                    console.log('✅ New ore site:', oreSite);
+                    
+                    // Save to localStorage
+                    const existingSites = JSON.parse(localStorage.getItem('trimark_ore_sites') || '[]');
+                    existingSites.push(oreSite);
+                    localStorage.setItem('trimark_ore_sites', JSON.stringify(existingSites));
+                    
+                    // Reset form
+                    form.reset();
+                    searchResults.style.display = 'none';
+                    
+                    alert('Ore site report submitted successfully!');
+                });
+            }
         });
+        
+        // Perform search
+        function performSearch(query) {
+            const searchResults = document.getElementById('searchResults');
+            
+            if (!query || query.length < 1) {
+                searchResults.style.display = 'none';
+                return;
+            }
+            
+            console.log('🔍 Searching for:', query);
+            console.log('🔍 Total systems available:', allSystems.length);
+            console.log('🔍 allSystems type:', typeof allSystems);
+            console.log('🔍 allSystems sample:', allSystems.slice(0, 5));
+            
+            const queryLower = query.toLowerCase();
+            const results = allSystems.filter(system => 
+                system.toLowerCase().includes(queryLower)
+            ).slice(0, 10); // Limit to 10 results
+            
+            console.log('🔍 Search results:', results);
+            console.log('🔍 Results length:', results.length);
+            
+            if (results.length > 0) {
+                searchResults.innerHTML = results.map(system => 
+                    `<div class="search-result-item" onclick="selectSystem('${system}')">${system}</div>`
+                ).join('');
+                searchResults.style.display = 'block';
+            } else {
+                searchResults.innerHTML = '<div class="search-result-item">No systems found</div>';
+                searchResults.style.display = 'block';
+            }
+        }
+        
+        // Select a system from search results
+        function selectSystem(systemName) {
+            document.getElementById('systemName').value = systemName;
+            document.getElementById('searchResults').style.display = 'none';
+        }
+        
+        // Test function
+        function testSearch() {
+            console.log('🧪 Testing search...');
+            console.log('🔍 Total systems available:', allSystems.length);
+            console.log('🔍 Sample systems:', allSystems.slice(0, 5));
+            
+            // Test search for "A" (should find "A 2560", etc.)
+            const results = allSystems.filter(system => 
+                system.toLowerCase().includes('a')
+            ).slice(0, 5);
+            
+            console.log('🔍 Search results for "A":', results);
+            
+            // Show results in search box
+            const searchResults = document.getElementById('searchResults');
+            if (results.length > 0) {
+                searchResults.innerHTML = results.map(system => 
+                    `<div class="search-result-item" onclick="selectSystem('${system}')">${system}</div>`
+                ).join('');
+                searchResults.style.display = 'block';
+            }
+        }
+        
+        // Show all systems
+        function showAllSystems() {
+            console.log('🔍 All custom systems:', allSystems);
+            alert(`Total custom systems available: ${allSystems.length}\n\nFirst 10 systems:\n${allSystems.slice(0, 10).join('\n')}`);
+        }
+        
+        // Test system loading
+        function testSystemLoading() {
+            console.log('🧪 Testing system loading...');
+            console.log('🔍 customSystems:', customSystems);
+            console.log('🔍 allSystems:', allSystems);
+            console.log('🔍 customSystems length:', customSystems ? customSystems.length : 'undefined');
+            console.log('🔍 allSystems length:', allSystems ? allSystems.length : 'undefined');
+            
+            // Test specific search
+            if (allSystems && allSystems.length > 0) {
+                const hResults = allSystems.filter(system => system.toLowerCase().includes('h:18'));
+                console.log('🔍 Systems containing "h:18":', hResults);
+                alert(`Systems found containing "h:18": ${hResults.length}\n\nResults:\n${hResults.join('\n')}`);
+            } else {
+                alert('No systems loaded! Check console for errors.');
+            }
+        }
     </script>
 </body>
 </html>

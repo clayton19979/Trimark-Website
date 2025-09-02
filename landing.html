@@ -267,7 +267,12 @@
                     const userData = await fetchEveFrontierData(account);
                     if (userData) {
                         // Check if user belongs to Trimark tribe (ID: 98000063)
-                        if (userData.tribeId === '98000063') {
+                        // Convert both to strings for comparison to handle type mismatches
+                        const userTribeId = String(userData.tribeId);
+                        const requiredTribeId = '98000063';
+                        const hasAccess = userTribeId === requiredTribeId;
+                        
+                        if (hasAccess) {
                             showWelcomeScreen(userData, account);
                         } else {
                             showTribeVerificationScreen(userData);
