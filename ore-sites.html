@@ -113,12 +113,14 @@
         }
         
         .ore-form {
+            width: 100%;
             max-width: 600px;
             margin: 0 auto;
             padding: 20px;
             background: rgba(26, 26, 46, 0.8);
             border: 1px solid rgba(0, 212, 255, 0.3);
             border-radius: 15px;
+            box-sizing: border-box;
         }
         
         .form-group {
@@ -178,6 +180,157 @@
             cursor: pointer;
             margin: 10px 5px;
         }
+        
+        /* Ore Sites List Styles */
+        .ore-sites-list {
+            margin-top: 20px;
+        }
+        
+        .ore-site-item {
+            background: rgba(26, 26, 46, 0.6);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+        
+        .ore-site-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .ore-site-system {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #00d4ff;
+        }
+        
+        .ore-site-type {
+            background: rgba(0, 212, 255, 0.2);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        
+        .ore-site-notes {
+            margin: 10px 0;
+            font-style: italic;
+            color: #ccc;
+        }
+        
+        .ore-site-reporter {
+            margin: 8px 0;
+            color: #00d4ff;
+            font-size: 0.9rem;
+        }
+        
+        .ore-site-date {
+            font-size: 0.8rem;
+            color: #888;
+            text-align: right;
+        }
+        
+        .ore-site-actions {
+            margin-top: 10px;
+            text-align: right;
+        }
+        
+        .delete-btn {
+            background: linear-gradient(135deg, #ff4757, #c44569);
+            border: none;
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        
+        .no-sites-message {
+            text-align: center;
+            color: #888;
+            font-style: italic;
+            padding: 20px;
+        }
+        
+        /* Wallet Status Styles */
+        .wallet-status {
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .wallet-info {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .wallet-label {
+            color: #00d4ff;
+            font-weight: 600;
+        }
+        
+        .wallet-value {
+            color: #fff;
+            font-weight: 500;
+        }
+        
+        .wallet-connected {
+            background: rgba(0, 255, 0, 0.1);
+            border-color: rgba(0, 255, 0, 0.3);
+        }
+        
+        .wallet-disconnected {
+            background: rgba(255, 0, 0, 0.1);
+            border-color: rgba(255, 0, 0, 0.3);
+        }
+        
+        /* Side by side layout styles */
+        .ore-sections-container {
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .ore-section {
+            flex: 1;
+            min-width: 0; /* Prevents flex items from overflowing */
+        }
+        
+        .report-section {
+            flex: 0 0 500px; /* Fixed width for report section */
+        }
+        
+        .view-section {
+            flex: 1; /* Takes remaining space */
+        }
+        
+        /* Responsive design for smaller screens */
+        @media (max-width: 1200px) {
+            .ore-sections-container {
+                flex-direction: column;
+                gap: 40px;
+            }
+            
+            .report-section {
+                flex: none;
+                width: 100%;
+            }
+            
+            .view-section {
+                flex: none;
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -206,96 +359,109 @@
             </nav>
         </header>
 
-        <main class="main-content">
-            <section class="ore-section">
-                <div class="ore-header">
-                    <h2 class="section-title">⛏️ Report New Ore Site</h2>
-                    <p class="section-subtitle">Help expand our mining operations by reporting new ore sites you discover.</p>
-                </div>
-                
-                <div class="ore-form">
-                                         <form id="oreSiteForm">
-                         <div class="form-group">
-                             <label for="systemName">System Name:</label>
-                             <div class="search-container">
-                                 <input type="text" id="systemName" class="search-input" placeholder="Type to search for systems..." autocomplete="off">
-                                 <div id="searchResults" class="search-results"></div>
+                <main class="main-content">
+            <div class="ore-sections-container">
+                <!-- Report New Ore Site Section -->
+                <section class="ore-section report-section">
+                    <div class="ore-header">
+                        <h2 class="section-title">⛏️ Report New Ore Site</h2>
+                        <p class="section-subtitle">Help expand our mining operations by reporting new ore sites you discover.</p>
+                    </div>
+                    
+                                         <div class="ore-form">
+                         <!-- Wallet Status Display -->
+                         <div class="wallet-status" id="walletStatus">
+                             <div class="wallet-info">
+                                 <span class="wallet-label">Connected as:</span>
+                                 <span class="wallet-value" id="walletStatusText">Checking...</span>
                              </div>
                          </div>
                          
-                         <div class="form-group">
-                             <label for="oreType">Ore Type:</label>
-                             <select id="oreType" class="form-select" required>
-                                 <option value="">Select Ore Type</option>
-                                 <option value="Common Ore">Common Ore</option>
-                                 <option value="Carbonaceous Ore">Carbonaceous Ore</option>
-                                 <option value="Metal Rich Ore">Metal Rich Ore</option>
-                                 <option value="Deep-Core Metallic Ore">Deep-Core Metallic Ore</option>
-                                 <option value="Deep-Core Carbon Ore">Deep-Core Carbon Ore</option>
-                                 <option value="Core Aestasium">Core Aestasium</option>
-                                 <option value="Core Hermetite">Core Hermetite</option>
-                                 <option value="Crude Matter">Crude Matter</option>
-                                 <option value="Special Materials">Special Materials</option>
-                             </select>
-                         </div>
+                         <form id="oreSiteForm">
+                             <div class="form-group">
+                                 <label for="systemName">System Name:</label>
+                                 <div class="search-container">
+                                     <input type="text" id="systemName" class="search-input" placeholder="Type to search for systems..." autocomplete="off">
+                                     <div id="searchResults" class="search-results"></div>
+                                 </div>
+                             </div>
+                            
+                            <div class="form-group">
+                                <label for="oreType">Ore Type:</label>
+                                <select id="oreType" class="form-select" required>
+                                    <option value="">Select Ore Type</option>
+                                    <option value="Common Ore">Common Ore</option>
+                                    <option value="Carbonaceous Ore">Carbonaceous Ore</option>
+                                    <option value="Metal Rich Ore">Metal Rich Ore</option>
+                                    <option value="Deep-Core Metallic Ore">Deep-Core Metallic Ore</option>
+                                    <option value="Deep-Core Carbon Ore">Deep-Core Carbon Ore</option>
+                                    <option value="Core Aestasium">Core Aestasium</option>
+                                    <option value="Core Hermetite">Core Hermetite</option>
+                                    <option value="Crude Matter">Crude Matter</option>
+                                    <option value="Special Materials">Special Materials</option>
+                                </select>
+                            </div>
+                            
+                                                         <div class="form-group">
+                                 <label for="siteNotes">Additional Notes:</label>
+                                 <textarea id="siteNotes" class="form-input" rows="3" placeholder="Any additional information about the site..."></textarea>
+                             </div>
+                             
+                             <div class="form-group">
+                                 <button type="submit" class="submit-btn">Submit Report</button>
+                             </div>
+                        </form>
+                        
                          
-                         <div class="form-group">
-                             <label for="siteNotes">Additional Notes:</label>
-                             <textarea id="siteNotes" class="form-input" rows="3" placeholder="Any additional information about the site..."></textarea>
+                    </div>
+                </section>
+                
+                <!-- View Submitted Ore Sites Section -->
+                <section class="ore-section view-section">
+                    <div class="ore-header">
+                        <h2 class="section-title">📋 View Submitted Ore Sites</h2>
+                        <p class="section-subtitle">Browse and manage all reported ore sites.</p>
+                    </div>
+                    
+                    <div class="ore-form">
+                        <div class="form-group">
+                            <label for="filterSystem">Filter by System:</label>
+                            <input type="text" id="filterSystem" class="form-input" placeholder="Type system name to filter...">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="filterOreType">Filter by Ore Type:</label>
+                            <select id="filterOreType" class="form-select">
+                                <option value="">All Ore Types</option>
+                                <option value="Common Ore">Common Ore</option>
+                                <option value="Carbonaceous Ore">Carbonaceous Ore</option>
+                                <option value="Metal Rich Ore">Metal Rich Ore</option>
+                                <option value="Deep-Core Metallic Ore">Deep-Core Metallic Ore</option>
+                                <option value="Deep-Core Carbon Ore">Deep-Core Carbon Ore</option>
+                                <option value="Core Aestasium">Core Aestasium</option>
+                                <option value="Core Hermetite">Core Hermetite</option>
+                                <option value="Crude Matter">Crude Matter</option>
+                                <option value="Special Materials">Special Materials</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="filterReporter">Filter by Reporter:</label>
+                            <input type="text" id="filterReporter" class="form-input" placeholder="Type reporter name to filter...">
+                        </div>
+                        
+                                                 <div class="form-group">
+                             <button onclick="loadOreSites()" class="submit-btn">Load Ore Sites</button>
+                             <button onclick="clearFilters()" class="test-btn" style="margin-left: 10px;">Clear Filters</button>
+                             <a href="logs.html" class="test-btn" style="margin-left: 10px; text-decoration: none; display: inline-block; text-align: center;">View Logs</a>
                          </div>
-                         
-                         <div class="form-group">
-                             <button type="submit" class="submit-btn">Submit Report</button>
-                         </div>
-                     </form>
-                     
-                     <div style="text-align: center; margin-top: 20px;">
-                         <button onclick="showAllSystems()" class="test-btn">Show All Systems</button>
-                         <button onclick="testSystemLoading()" class="test-btn">Test System Loading</button>
-                     </div>
-                 </div>
-             </section>
-             
-             <!-- View Submitted Ore Sites Section -->
-             <section class="ore-section" style="margin-top: 40px;">
-                 <div class="ore-header">
-                     <h2 class="section-title">📋 View Submitted Ore Sites</h2>
-                     <p class="section-subtitle">Browse and manage all reported ore sites.</p>
-                 </div>
-                 
-                 <div class="ore-form">
-                     <div class="form-group">
-                         <label for="filterSystem">Filter by System:</label>
-                         <input type="text" id="filterSystem" class="form-input" placeholder="Type system name to filter...">
-                     </div>
-                     
-                     <div class="form-group">
-                         <label for="filterOreType">Filter by Ore Type:</label>
-                         <select id="filterOreType" class="form-select">
-                             <option value="">All Ore Types</option>
-                             <option value="Common Ore">Common Ore</option>
-                             <option value="Carbonaceous Ore">Carbonaceous Ore</option>
-                             <option value="Metal Rich Ore">Metal Rich Ore</option>
-                             <option value="Deep-Core Metallic Ore">Deep-Core Metallic Ore</option>
-                             <option value="Deep-Core Carbon Ore">Deep-Core Carbon Ore</option>
-                             <option value="Core Aestasium">Core Aestasium</option>
-                             <option value="Core Hermetite">Core Hermetite</option>
-                             <option value="Crude Matter">Crude Matter</option>
-                             <option value="Special Materials">Special Materials</option>
-                         </select>
-                     </div>
-                     
-                     <div class="form-group">
-                         <button onclick="loadOreSites()" class="submit-btn">Load Ore Sites</button>
-                         <button onclick="clearFilters()" class="test-btn" style="margin-left: 10px;">Clear Filters</button>
-                     </div>
-                     
-                     <div id="oreSitesList" class="ore-sites-list">
-                         <!-- Ore sites will be displayed here -->
-                     </div>
-                 </div>
-                </div>
-            </section>
+                        
+                        <div id="oreSitesList" class="ore-sites-list">
+                            <!-- Ore sites will be displayed here -->
+                        </div>
+                    </div>
+                </section>
+            </div>
         </main>
     </div>
 
@@ -338,29 +504,37 @@
                 form.addEventListener('submit', function(e) {
                     e.preventDefault();
                     
-                    const systemName = document.getElementById('systemName').value;
-                    const oreType = document.getElementById('oreType').value;
-                    const notes = document.getElementById('siteNotes').value;
-                    
-                    if (!systemName || !oreType) {
-                        alert('Please fill in all required fields.');
-                        return;
-                    }
-                    
-                    // Check if system exists
-                    if (!allSystems.includes(systemName)) {
-                        alert('Please select a valid system from the search results.');
-                        return;
-                    }
-                    
-                    // Create ore site
-                    const oreSite = {
-                        id: 'ore_' + Date.now(),
-                        system: systemName,
-                        oreType: oreType,
-                        notes: notes || 'No additional notes.',
-                        reportedAt: new Date().toLocaleString()
-                    };
+                                         const systemName = document.getElementById('systemName').value;
+                     const oreType = document.getElementById('oreType').value;
+                     const notes = document.getElementById('siteNotes').value;
+                     
+                     if (!systemName || !oreType) {
+                         alert('Please fill in all required fields.');
+                         return;
+                     }
+                     
+                     // Check if system exists
+                     if (!allSystems.includes(systemName)) {
+                         alert('Please select a valid system from the search results.');
+                         return;
+                     }
+                     
+                     // Get reporter name from stored user data (secure)
+                     const userData = JSON.parse(localStorage.getItem('trimark_user_data') || '{}');
+                     if (!userData.name) {
+                         alert('Please connect your wallet first from the landing page.');
+                         return;
+                     }
+                     
+                     // Create ore site
+                     const oreSite = {
+                         id: 'ore_' + Date.now(),
+                         system: systemName,
+                         oreType: oreType,
+                         notes: notes || 'No additional notes.',
+                         reporter: userData.name,
+                         reportedAt: new Date().toLocaleString()
+                     };
                     
                     console.log('✅ New ore site:', oreSite);
                     
@@ -369,11 +543,14 @@
                     existingSites.push(oreSite);
                     localStorage.setItem('trimark_ore_sites', JSON.stringify(existingSites));
                     
-                    // Reset form
-                    form.reset();
-                    searchResults.style.display = 'none';
-                    
-                    alert('Ore site report submitted successfully!');
+                                         // Reset form
+                     form.reset();
+                     searchResults.style.display = 'none';
+                     
+                     alert('Ore site report submitted successfully!');
+                     
+                     // Refresh the ore sites list
+                     loadOreSites();
                 });
             }
         });
@@ -440,29 +617,145 @@
             }
         }
         
-        // Show all systems
-        function showAllSystems() {
-            console.log('🔍 All custom systems:', allSystems);
-            alert(`Total custom systems available: ${allSystems.length}\n\nFirst 10 systems:\n${allSystems.slice(0, 10).join('\n')}`);
+
+        
+
+        
+        // Load and display ore sites
+        function loadOreSites() {
+            const filterSystem = document.getElementById('filterSystem').value.toLowerCase();
+            const filterOreType = document.getElementById('filterOreType').value;
+            const filterReporter = document.getElementById('filterReporter').value.toLowerCase();
+            
+            // Get ore sites from localStorage
+            const oreSites = JSON.parse(localStorage.getItem('trimark_ore_sites') || '[]');
+            
+            // Apply filters
+            let filteredSites = oreSites;
+            
+            if (filterSystem) {
+                filteredSites = filteredSites.filter(site => 
+                    site.system.toLowerCase().includes(filterSystem)
+                );
+            }
+            
+            if (filterOreType) {
+                filteredSites = filteredSites.filter(site => 
+                    site.oreType === filterOreType
+                );
+            }
+            
+            if (filterReporter) {
+                filteredSites = filteredSites.filter(site => 
+                    site.reporter && site.reporter.toLowerCase().includes(filterReporter)
+                );
+            }
+            
+            // Sort by date (newest first)
+            filteredSites.sort((a, b) => new Date(b.reportedAt) - new Date(a.reportedAt));
+            
+            displayOreSites(filteredSites);
         }
         
-        // Test system loading
-        function testSystemLoading() {
-            console.log('🧪 Testing system loading...');
-            console.log('🔍 customSystems:', customSystems);
-            console.log('🔍 allSystems:', allSystems);
-            console.log('🔍 customSystems length:', customSystems ? customSystems.length : 'undefined');
-            console.log('🔍 allSystems length:', allSystems ? allSystems.length : 'undefined');
+        // Display ore sites in the list
+        function displayOreSites(oreSites) {
+            const oreSitesList = document.getElementById('oreSitesList');
             
-            // Test specific search
-            if (allSystems && allSystems.length > 0) {
-                const hResults = allSystems.filter(system => system.toLowerCase().includes('h:18'));
-                console.log('🔍 Systems containing "h:18":', hResults);
-                alert(`Systems found containing "h:18": ${hResults.length}\n\nResults:\n${hResults.join('\n')}`);
-            } else {
-                alert('No systems loaded! Check console for errors.');
+            if (oreSites.length === 0) {
+                oreSitesList.innerHTML = '<div class="no-sites-message">No ore sites found matching the current filters.</div>';
+                return;
+            }
+            
+                         const sitesHTML = oreSites.map(site => `
+                 <div class="ore-site-item">
+                     <div class="ore-site-header">
+                         <span class="ore-site-system">${site.system}</span>
+                         <span class="ore-site-type">${site.oreType}</span>
+                     </div>
+                     <div class="ore-site-reporter">Reported by: <strong>${site.reporter || 'Unknown'}</strong></div>
+                     <div class="ore-site-notes">${site.notes}</div>
+                     <div class="ore-site-date">Reported: ${site.reportedAt}</div>
+                     <div class="ore-site-actions">
+                         <button onclick="deleteOreSite('${site.id}')" class="delete-btn">Delete</button>
+                     </div>
+                 </div>
+             `).join('');
+            
+            oreSitesList.innerHTML = sitesHTML;
+        }
+        
+        // Delete an ore site
+        function deleteOreSite(siteId) {
+            const reason = prompt('Please provide a reason for deleting this ore site:');
+            if (reason !== null) { // User didn't cancel
+                if (confirm('Are you sure you want to delete this ore site?')) {
+                    const oreSites = JSON.parse(localStorage.getItem('trimark_ore_sites') || '[]');
+                    const siteToDelete = oreSites.find(site => site.id === siteId);
+                    
+                    // Get the character name from stored user data
+                    const userData = JSON.parse(localStorage.getItem('trimark_user_data') || '{}');
+                    const deletedBy = userData.name || 'Unknown Character';
+                    
+                    // Log the deletion with reason and character name
+                    const deletionLog = {
+                        id: 'del_' + Date.now(),
+                        siteId: siteId,
+                        siteSystem: siteToDelete ? siteToDelete.system : 'Unknown',
+                        deletedAt: new Date().toLocaleString(),
+                        reason: reason || 'No reason provided',
+                        deletedBy: deletedBy
+                    };
+                    
+                    // Save deletion log to localStorage
+                    const existingDeletions = JSON.parse(localStorage.getItem('trimark_deletion_log') || '[]');
+                    existingDeletions.push(deletionLog);
+                    localStorage.setItem('trimark_deletion_log', JSON.stringify(existingDeletions));
+                    
+                    // Remove the ore site
+                    const updatedSites = oreSites.filter(site => site.id !== siteId);
+                    localStorage.setItem('trimark_ore_sites', JSON.stringify(updatedSites));
+                    
+                    // Reload the display
+                    loadOreSites();
+                    
+                    console.log('✅ Ore site deleted:', siteId, 'Reason:', reason, 'By:', deletedBy);
+                    alert('Ore site deleted successfully. Reason logged.');
+                }
             }
         }
+        
+        // Clear all filters
+        function clearFilters() {
+            document.getElementById('filterSystem').value = '';
+            document.getElementById('filterOreType').value = '';
+            document.getElementById('filterReporter').value = '';
+            loadOreSites();
+        }
+        
+
+        
+
+        
+        // Auto-load ore sites when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check wallet status and display it
+            const userData = JSON.parse(localStorage.getItem('trimark_user_data') || '{}');
+            const walletStatus = document.getElementById('walletStatus');
+            const walletStatusText = document.getElementById('walletStatusText');
+            
+            if (userData && userData.name) {
+                walletStatus.className = 'wallet-status wallet-connected';
+                walletStatusText.textContent = userData.name;
+                console.log('✅ Wallet connected:', userData.name);
+            } else {
+                walletStatus.className = 'wallet-status wallet-disconnected';
+                walletStatusText.textContent = 'Not connected - Please log in from landing page';
+                console.log('❌ No wallet connected');
+            }
+            
+            // Load ore sites after a short delay to ensure everything is initialized
+            setTimeout(loadOreSites, 1000);
+        });
     </script>
 </body>
 </html>

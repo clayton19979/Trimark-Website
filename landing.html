@@ -273,6 +273,8 @@
                         const hasAccess = userTribeId === requiredTribeId;
                         
                         if (hasAccess) {
+                            // Store user data in localStorage for other pages to use
+                            localStorage.setItem('trimark_user_data', JSON.stringify(userData));
                             showWelcomeScreen(userData, account);
                         } else {
                             showTribeVerificationScreen(userData);
@@ -340,6 +342,50 @@
             }
         }
 
+        // Get role display information
+        function getRoleDisplayInfo(role) {
+            const roleInfo = {
+                'administrator': {
+                    display: '👑 Administrator',
+                    name: 'Administrator'
+                },
+                'diplomatic_officer': {
+                    display: '🤝 Diplomatic Officer',
+                    name: 'Diplomatic Officer'
+                },
+                'lead_tactician': {
+                    display: '⚔️ Lead Tactician',
+                    name: 'Lead Tactician'
+                },
+                'field_survey_lead': {
+                    display: '🔍 Field Survey Lead',
+                    name: 'Field Survey Lead'
+                },
+                'recruiter': {
+                    display: '📢 Recruiter',
+                    name: 'Recruiter'
+                },
+                'ambassador': {
+                    display: '🌐 Ambassador',
+                    name: 'Ambassador'
+                },
+                'crew_member': {
+                    display: '👥 Crew Member',
+                    name: 'Crew Member'
+                },
+                'event_coordinator': {
+                    display: '📅 Event Coordinator',
+                    name: 'Event Coordinator'
+                },
+                'member': {
+                    display: '👤 Member',
+                    name: 'Member'
+                }
+            };
+            
+            return roleInfo[role] || roleInfo['member'];
+        }
+
         // Show welcome screen with user data
         function showWelcomeScreen(userData, account) {
             console.log('🎉 Showing welcome screen for:', userData.name);
@@ -361,10 +407,30 @@
             // Set user name
             userName.textContent = userData.name || 'Unknown Character';
             
-            // Set user role (default to Member if no role assigned)
-            const roleText = '👤 Member'; // Default role for all users
-            userRole.innerHTML = roleText;
-            roleDisplay.textContent = 'Member';
+            // Get user's actual roles from localStorage
+            const userRoles = JSON.parse(localStorage.getItem('trimark_user_roles') || '{}');
+            const userRolesArray = userRoles[userData.name];
+            
+            if (userRolesArray && Array.isArray(userRolesArray) && userRolesArray.length > 0) {
+                // User has multiple roles
+                const roleDisplays = userRolesArray.map(role => {
+                    const roleInfo = getRoleDisplayInfo(role);
+                    return roleInfo.display;
+                });
+                
+                userRole.innerHTML = roleDisplays.join('<br>');
+                roleDisplay.textContent = userRolesArray.map(role => getRoleDisplayInfo(role).name).join(', ');
+            } else if (userRolesArray && !Array.isArray(userRolesArray)) {
+                // Handle old single-role format
+                const roleInfo = getRoleDisplayInfo(userRolesArray);
+                userRole.innerHTML = roleInfo.display;
+                roleDisplay.textContent = roleInfo.name;
+            } else {
+                // No roles assigned
+                const roleInfo = getRoleDisplayInfo('member');
+                userRole.innerHTML = roleInfo.display;
+                roleDisplay.textContent = roleInfo.name;
+            }
             
             // Show welcome screen
             const welcomeScreen = document.getElementById('welcomeScreen');
@@ -394,10 +460,20 @@
             // Set user name (shortened address)
             userName.textContent = `${account.substring(0, 6)}...${account.substring(account.length - 4)}`;
             
-            // Set default role
-            const roleText = '👤 Member';
-            userRole.innerHTML = roleText;
-            roleDisplay.textContent = 'Member';
+            // Try to get user roles from localStorage if possible
+            const userRoles = JSON.parse(localStorage.getItem('trimark_user_roles') || '{}');
+            let userRoleName = 'member';
+            
+            // Try to find the user by wallet address (this is a fallback, so we'll use default)
+            for (const [name, roles] of Object.entries(userRoles)) {
+                // Since we don't have the character name in fallback, we'll use default
+                break;
+            }
+            
+            // Get role display info (default to member for fallback)
+            const roleInfo = getRoleDisplayInfo(userRoleName);
+            userRole.innerHTML = roleInfo.display;
+            roleDisplay.textContent = roleInfo.name;
             
             // Show welcome screen
             const welcomeScreen = document.getElementById('welcomeScreen');
