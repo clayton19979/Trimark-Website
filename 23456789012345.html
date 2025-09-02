@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Members - Tribe Members</title>
+    <title>Events - Corporation Events</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js" type="application/javascript" onerror="loadEthersFallback()"></script>
@@ -16,6 +16,20 @@
             script.onerror = () => console.error('All ethers CDNs failed');
             document.head.appendChild(script);
         }
+        
+        // Check wallet connection on page load - SECURITY GATE
+        document.addEventListener('DOMContentLoaded', function() {
+            const walletConnected = localStorage.getItem('walletConnected');
+            const walletAccount = localStorage.getItem('walletAccount');
+            
+            if (!walletConnected || !walletAccount) {
+                console.log('❌ No wallet connection found, redirecting to landing page');
+                window.location.href = 'landing.html';
+                return;
+            }
+            
+            console.log('✅ Wallet connection verified:', walletAccount);
+        });
     </script>
     <script src="https://unpkg.com/@metamask/detect-provider@2.0.0/dist/detect-provider.min.js"></script>
 </head>
@@ -36,13 +50,13 @@
             </div>
             
             <nav class="nav">
-                <a href="index.html" class="nav-link">Home</a>
-                <a href="about.html" class="nav-link">About</a>
-                <a href="ore-sites.html" class="nav-link">Ore Sites</a>
-                <a href="roles.html" class="nav-link">Roles</a>
-                <a href="members.html" class="nav-link active">Members</a>
-                <a href="events.html" class="nav-link">Events</a>
-                <a href="logs.html" class="nav-link">Logs</a>
+                <a href="57438920535443.html" class="nav-link">Home</a>
+                <a href="89234756123456.html" class="nav-link">About</a>
+                <a href="34567890123456.html" class="nav-link">Ore Sites</a>
+                <a href="45678912345678.html" class="nav-link">Roles</a>
+                <a href="98765432109876.html" class="nav-link">Members</a>
+                <a href="23456789012345.html" class="nav-link active">Events</a>
+                <a href="87654321098765.html" class="nav-link">Logs</a>
             </nav>
 
             <div class="wallet-section">
@@ -140,36 +154,71 @@
         </div>
 
         <main class="main-content">
-            <section id="members" class="members-section">
-                <h2 class="section-title">Tribe Members</h2>
-                <div class="members-content">
-                    <div class="members-header">
-                        <div class="members-info">
-                            <h3>Trimark Industries Members</h3>
-                            <p>Complete roster of all active tribe members, their join dates, and time in service.</p>
-                        </div>
-                        <div class="members-controls">
-                            <div class="member-count">
-                                Total Members: <span id="totalMemberCount" style="color: #00d4ff; font-weight: bold;">0</span>
+            <section id="events" class="events-section">
+                <h2 class="section-title">Corporation Events</h2>
+                <div class="events-content">
+                    <div class="events-info">
+                        <h3>Upcoming Operations & Events</h3>
+                        <p>Stay informed about scheduled operations, training sessions, and corporate events. Event Coordinators can create and manage events for the corporation.</p>
+                        
+                        <div class="event-types">
+                            <div class="event-type">
+                                <span class="event-icon">⚔️</span>
+                                <span>Combat Operations</span>
+                                <span class="event-desc">Strategic combat missions and fleet operations</span>
                             </div>
-                            <button onclick="refreshTribeMembers()" class="member-btn secondary">
-                                🔄 Refresh Members
-                            </button>
+                            <div class="event-type">
+                                <span class="event-icon">🏭</span>
+                                <span>Manufacturing Runs</span>
+                                <span class="event-desc">Coordinated production and resource processing</span>
+                            </div>
+                            <div class="event-type">
+                                <span class="event-icon">🔍</span>
+                                <span>Exploration Missions</span>
+                                <span class="event-desc">Resource discovery and territory mapping</span>
+                            </div>
+                            <div class="event-type">
+                                <span class="event-icon">📚</span>
+                                <span>Training Sessions</span>
+                                <span class="event-desc">Skill development and tactical training</span>
+                            </div>
                         </div>
                     </div>
                     
-                    <div class="members-list-container">
-                        <div class="members-filters">
-                            <input type="text" id="memberSearchInput" placeholder="Search members by name..." class="member-search-input">
-                            <select id="memberSortSelect" class="member-sort-select">
-                                <option value="name">Sort by Name</option>
-                                <option value="joinDate">Sort by Join Date</option>
-                                <option value="timeInTribe">Sort by Time in Tribe</option>
-                            </select>
+                    <div class="events-management">
+                        <div class="event-creation-form">
+                            <h4>Create New Event</h4>
+                            <p>Event Coordinators can schedule new operations and events for the corporation.</p>
+                            <div class="form-group">
+                                <label for="eventTitle">Event Title</label>
+                                <input type="text" id="eventTitle" placeholder="Enter event title" class="event-input">
+                            </div>
+                            <div class="form-group">
+                                <label for="eventDescription">Description</label>
+                                <textarea id="eventDescription" placeholder="Describe the event, objectives, and requirements..." class="event-textarea"></textarea>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="eventDate">Date</label>
+                                    <input type="date" id="eventDate" class="event-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="eventTime">Time</label>
+                                    <input type="time" id="eventTime" class="event-input">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="eventLocation">Location</label>
+                                <input type="text" id="eventLocation" placeholder="System, coordinates, or meeting point" class="event-input">
+                            </div>
+                            <button id="createEventBtn" class="event-btn primary">Create Event</button>
                         </div>
                         
-                        <div id="membersList" class="members-list">
-                            <!-- Members will be populated here -->
+                        <div class="events-list">
+                            <h4>Current Events</h4>
+                            <div id="eventsList" class="events-container">
+                                <!-- Events will be populated here -->
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -182,7 +231,6 @@
         <footer class="footer">
             <div class="footer-content">
                 <div class="footer-section">
-                    <h4>Quick Links</h4>
                     <a href="index.html">Home</a>
                     <a href="about.html">About</a>
                     <a href="ore-sites.html">Ore Sites</a>
@@ -196,26 +244,26 @@
                 <p>&copy; 2024. All rights reserved.</p>
             </div>
             
-                         <!-- The Architect's Signature - Hidden in footer -->
-             <div class="architect-signature">
-                 <svg class="h-48 w-48 animate-pulse-slow" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                     <!-- The central, perfect triangle representing the unified universe -->
-                     <path d="M50 5 L95 95 H5 L50 5 Z" stroke="#00F8FF" stroke-width="2" />
-                     
-                     <!-- Fragmentation lines, symbolizing the shattering of reality -->
-                     <line x1="50" y1="5" x2="50" y2="30" stroke="#00F8FF" stroke-width="1.5" />
-                     <line x1="50" y1="50" x2="50" y2="70" stroke="#00F8FF" stroke-width="1.5" />
+            <!-- The Architect's Signature - Hidden in footer -->
+            <div class="architect-signature">
+                <svg class="h-48 w-48 animate-pulse-slow" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- The central, perfect triangle representing the unified universe -->
+                    <path d="M50 5 L95 95 H5 L50 5 Z" stroke="#00F8FF" stroke-width="2" />
+                    
+                    <!-- Fragmentation lines, symbolizing the shattering of reality -->
+                    <line x1="50" y1="5" x2="50" y2="30" stroke="#00F8FF" stroke-width="1.5" />
+                    <line x1="50" y1="50" x2="50" y2="70" stroke="#00F8FF" stroke-width="1.5" />
 
-                     <line x1="5" y1="95" x2="30" y2="95" stroke="#00F8FF" stroke-width="1.5" />
-                     <line x1="70" y1="95" x2="95" y2="95" stroke="#00F8FF" stroke-width="1.5" />
+                    <line x1="5" y1="95" x2="30" y2="95" stroke="#00F8FF" stroke-width="1.5" />
+                    <line x1="70" y1="95" x2="95" y2="95" stroke="#00F8FF" stroke-width="1.5" />
 
-                     <line x1="50" y1="50" x2="75" y2="75" stroke="#00F8FF" stroke-width="1.5" />
-                     <line x1="50" y1="50" x2="25" y2="75" stroke="#00F8FF" stroke-width="1.5" />
-                     
-                     <!-- Central point of purpose or "eye" of the Architect -->
-                     <circle cx="50" cy="50" r="4" fill="#00F8FF" />
-                 </svg>
-             </div>
+                    <line x1="50" y1="50" x2="75" y2="75" stroke="#00F8FF" stroke-width="1.5" />
+                    <line x1="50" y1="50" x2="25" y2="75" stroke="#00F8FF" stroke-width="1.5" />
+                    
+                    <!-- Central point of purpose or "eye" of the Architect -->
+                    <circle cx="50" cy="50" r="4" fill="#00F8FF" />
+                </svg>
+            </div>
         </footer>
     </div>
 

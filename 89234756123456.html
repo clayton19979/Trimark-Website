@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Events - Corporation Events</title>
+    <title>About - Member Resources</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js" type="application/javascript" onerror="loadEthersFallback()"></script>
@@ -16,6 +16,20 @@
             script.onerror = () => console.error('All ethers CDNs failed');
             document.head.appendChild(script);
         }
+        
+        // Check wallet connection on page load - SECURITY GATE
+        document.addEventListener('DOMContentLoaded', function() {
+            const walletConnected = localStorage.getItem('walletConnected');
+            const walletAccount = localStorage.getItem('walletAccount');
+            
+            if (!walletConnected || !walletAccount) {
+                console.log('❌ No wallet connection found, redirecting to landing page');
+                window.location.href = 'landing.html';
+                return;
+            }
+            
+            console.log('✅ Wallet connection verified:', walletAccount);
+        });
     </script>
     <script src="https://unpkg.com/@metamask/detect-provider@2.0.0/dist/detect-provider.min.js"></script>
 </head>
@@ -36,13 +50,13 @@
             </div>
             
             <nav class="nav">
-                <a href="index.html" class="nav-link">Home</a>
-                <a href="about.html" class="nav-link">About</a>
-                <a href="ore-sites.html" class="nav-link">Ore Sites</a>
-                <a href="roles.html" class="nav-link">Roles</a>
-                <a href="members.html" class="nav-link">Members</a>
-                <a href="events.html" class="nav-link active">Events</a>
-                <a href="logs.html" class="nav-link">Logs</a>
+                <a href="57438920535443.html" class="nav-link">Home</a>
+                <a href="89234756123456.html" class="nav-link active">About</a>
+                <a href="34567890123456.html" class="nav-link">Ore Sites</a>
+                <a href="45678912345678.html" class="nav-link">Roles</a>
+                <a href="98765432109876.html" class="nav-link">Members</a>
+                <a href="23456789012345.html" class="nav-link">Events</a>
+                <a href="87654321098765.html" class="nav-link">Logs</a>
             </nav>
 
             <div class="wallet-section">
@@ -140,72 +154,23 @@
         </div>
 
         <main class="main-content">
-            <section id="events" class="events-section">
-                <h2 class="section-title">Corporation Events</h2>
-                <div class="events-content">
-                    <div class="events-info">
-                        <h3>Upcoming Operations & Events</h3>
-                        <p>Stay informed about scheduled operations, training sessions, and corporate events. Event Coordinators can create and manage events for the corporation.</p>
-                        
-                        <div class="event-types">
-                            <div class="event-type">
-                                <span class="event-icon">⚔️</span>
-                                <span>Combat Operations</span>
-                                <span class="event-desc">Strategic combat missions and fleet operations</span>
-                            </div>
-                            <div class="event-type">
-                                <span class="event-icon">🏭</span>
-                                <span>Manufacturing Runs</span>
-                                <span class="event-desc">Coordinated production and resource processing</span>
-                            </div>
-                            <div class="event-type">
-                                <span class="event-icon">🔍</span>
-                                <span>Exploration Missions</span>
-                                <span class="event-desc">Resource discovery and territory mapping</span>
-                            </div>
-                            <div class="event-type">
-                                <span class="event-icon">📚</span>
-                                <span>Training Sessions</span>
-                                <span class="event-desc">Skill development and tactical training</span>
-                            </div>
-                        </div>
+            <section id="about" class="about-section">
+                <h2 class="section-title">Member Resources</h2>
+                <div class="about-grid">
+                    <div class="about-card">
+                        <div class="card-icon">📊</div>
+                        <h3>Operations Dashboard</h3>
+                        <p>Monitor current mining operations, manufacturing queues, and logistics status across all our active star systems.</p>
                     </div>
-                    
-                    <div class="events-management">
-                        <div class="event-creation-form">
-                            <h4>Create New Event</h4>
-                            <p>Event Coordinators can schedule new operations and events for the corporation.</p>
-                            <div class="form-group">
-                                <label for="eventTitle">Event Title</label>
-                                <input type="text" id="eventTitle" placeholder="Enter event title" class="event-input">
-                            </div>
-                            <div class="form-group">
-                                <label for="eventDescription">Description</label>
-                                <textarea id="eventDescription" placeholder="Describe the event, objectives, and requirements..." class="event-textarea"></textarea>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="eventDate">Date</label>
-                                    <input type="date" id="eventDate" class="event-input">
-                                </div>
-                                <div class="form-group">
-                                    <label for="eventTime">Time</label>
-                                    <input type="time" id="eventTime" class="event-input">
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="eventLocation">Location</label>
-                                <input type="text" id="eventLocation" placeholder="System, coordinates, or meeting point" class="event-input">
-                            </div>
-                            <button id="createEventBtn" class="event-btn primary">Create Event</button>
-                        </div>
-                        
-                        <div class="events-list">
-                            <h4>Current Events</h4>
-                            <div id="eventsList" class="events-container">
-                                <!-- Events will be populated here -->
-                            </div>
-                        </div>
+                    <div class="about-card">
+                        <div class="card-icon">📋</div>
+                        <h3>Mission Board</h3>
+                        <p>View available assignments, track your contributions, and coordinate with other members on strategic operations.</p>
+                    </div>
+                    <div class="about-card">
+                        <div class="card-icon">💼</div>
+                        <h3>Corporation Tools</h3>
+                        <p>Access specialized equipment, blueprints, and resources needed for your role within Trimark Industries.</p>
                     </div>
                 </div>
             </section>
@@ -217,6 +182,7 @@
         <footer class="footer">
             <div class="footer-content">
                 <div class="footer-section">
+                    <h4>Quick Links</h4>
                     <a href="index.html">Home</a>
                     <a href="about.html">About</a>
                     <a href="ore-sites.html">Ore Sites</a>

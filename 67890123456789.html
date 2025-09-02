@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Security Updates - Trimark Industries</title>
+    <title>Logistics Network - Trimark Industries</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js" type="application/javascript" onerror="loadEthersFallback()"></script>
@@ -16,6 +16,20 @@
             script.onerror = () => console.error('All ethers CDNs failed');
             document.head.appendChild(script);
         }
+        
+        // Check wallet connection on page load - SECURITY GATE
+        document.addEventListener('DOMContentLoaded', function() {
+            const walletConnected = localStorage.getItem('walletConnected');
+            const walletAccount = localStorage.getItem('walletAccount');
+            
+            if (!walletConnected || !walletAccount) {
+                console.log('❌ No wallet connection found, redirecting to landing page');
+                window.location.href = 'landing.html';
+                return;
+            }
+            
+            console.log('✅ Wallet connection verified:', walletAccount);
+        });
     </script>
     <script src="https://unpkg.com/@metamask/detect-provider@2.0.0/dist/detect-provider.min.js"></script>
 </head>
@@ -36,12 +50,12 @@
             </div>
             
             <nav class="nav">
-                <a href="index.html" class="nav-link">Home</a>
-                <a href="about.html" class="nav-link">About</a>
+                <a href="57438920535443.html" class="nav-link">Home</a>
+                <a href="89234756123456.html" class="nav-link">About</a>
                 <a href="services.html" class="nav-link">Services</a>
-                <a href="roles.html" class="nav-link">Roles</a>
-                <a href="members.html" class="nav-link">Members</a>
-                <a href="events.html" class="nav-link">Events</a>
+                <a href="45678912345678.html" class="nav-link">Roles</a>
+                <a href="98765432109876.html" class="nav-link">Members</a>
+                <a href="23456789012345.html" class="nav-link">Events</a>
             </nav>
 
             <div class="wallet-section">
@@ -138,53 +152,56 @@
             </div>
         </div>
 
-        <!-- Report Security Threat Modal -->
-        <div id="reportSecurityThreatModal" class="admin-modal hidden">
+        <!-- Add Logistics Route Modal -->
+        <div id="addLogisticsRouteModal" class="admin-modal hidden">
             <div class="admin-modal-content">
                 <div class="admin-modal-header">
-                    <h2>🚨 Report Security Threat</h2>
-                    <button id="closeSecurityModal" class="close-btn">×</button>
+                    <h2>🚛 Add Logistics Route</h2>
+                    <button id="closeLogisticsModal" class="close-btn">×</button>
                 </div>
                 <div class="admin-modal-body">
                     <div class="admin-section">
-                        <form id="securityThreatForm">
+                        <form id="logisticsRouteForm">
                             <div class="form-group">
-                                <label for="threatLevel">Threat Level:</label>
-                                <select id="threatLevel" required class="admin-input">
-                                    <option value="">Select Threat Level</option>
+                                <label for="routeName">Route Name:</label>
+                                <input type="text" id="routeName" required class="admin-input">
+                            </div>
+                            <div class="form-group">
+                                <label for="originSystem">Origin System:</label>
+                                <input type="text" id="originSystem" required class="admin-input">
+                            </div>
+                            <div class="form-group">
+                                <label for="destinationSystem">Destination System:</label>
+                                <input type="text" id="destinationSystem" required class="admin-input">
+                            </div>
+                            <div class="form-group">
+                                <label for="cargoType">Cargo Type:</label>
+                                <input type="text" id="cargoType" required class="admin-input" placeholder="e.g., Ore, Ships, Components">
+                            </div>
+                            <div class="form-group">
+                                <label for="cargoVolume">Cargo Volume (m³):</label>
+                                <input type="number" id="cargoVolume" required class="admin-input" min="1">
+                            </div>
+                            <div class="form-group">
+                                <label for="assignedPilot">Assigned Pilot:</label>
+                                <input type="text" id="assignedPilot" required class="admin-input">
+                            </div>
+                            <div class="form-group">
+                                <label for="priority">Priority:</label>
+                                <select id="priority" required class="admin-input">
                                     <option value="low">Low</option>
-                                    <option value="medium">Medium</option>
+                                    <option value="normal" selected>Normal</option>
                                     <option value="high">High</option>
                                     <option value="critical">Critical</option>
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="region">Region:</label>
-                                <input type="text" id="region" required class="admin-input" placeholder="e.g., Catch, The Forge, Essence">
-                            </div>
-                            <div class="form-group">
-                                <label for="system">System:</label>
-                                <input type="text" id="system" required class="admin-input" placeholder="e.g., F-HQX5, Jita, O-EIMK">
-                            </div>
-                            <div class="form-group">
-                                <label for="threatType">Threat Type:</label>
-                                <input type="text" id="threatType" required class="admin-input" placeholder="e.g., Pirate activity, Ganking attempts, Rogue drones">
-                            </div>
-                            <div class="form-group">
-                                <label for="recommendations">Recommendations:</label>
-                                <textarea id="recommendations" required class="admin-input" rows="3" placeholder="What should members do to stay safe?"></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label for="source">Source:</label>
-                                <input type="text" id="source" required class="admin-input" placeholder="e.g., Intel Report, Local Comms, Fleet Report">
-                            </div>
-                            <div class="form-group">
-                                <label for="additionalNotes">Additional Notes:</label>
-                                <textarea id="additionalNotes" class="admin-input" rows="2" placeholder="Any additional information..."></textarea>
+                                <label for="routeNotes">Route Notes:</label>
+                                <textarea id="routeNotes" class="admin-input" rows="3" placeholder="Any special requirements or notes..."></textarea>
                             </div>
                             <div class="form-actions">
-                                <button type="submit" class="admin-btn">Submit Report</button>
-                                <button type="button" id="cancelSecurity" class="admin-btn secondary">Cancel</button>
+                                <button type="submit" class="admin-btn">Add Route</button>
+                                <button type="button" id="cancelLogistics" class="admin-btn secondary">Cancel</button>
                             </div>
                         </form>
                     </div>
@@ -193,52 +210,52 @@
         </div>
 
         <main class="main-content">
-            <section id="security" class="security-section">
-                <div class="security-header">
-                    <h2 class="section-title">Security Updates</h2>
-                    <p class="section-subtitle">Latest intelligence on threats, safe passage recommendations, and coordination protocols for member safety.</p>
-                    <button id="reportSecurityThreat" class="cta-btn">🚨 Report Threat</button>
+            <section id="logistics" class="logistics-section">
+                <div class="logistics-header">
+                    <h2 class="section-title">Logistics Network</h2>
+                    <p class="section-subtitle">Current trade routes, supply chain status, and transportation schedules for optimal resource distribution.</p>
+                    <button id="addLogisticsRoute" class="cta-btn">🚛 Add Logistics Route</button>
                 </div>
                 
-                <div class="security-content">
-                    <div class="security-filters">
-                        <input type="text" id="securitySearch" placeholder="Search threats..." class="security-search-input">
-                        <select id="securityFilter" class="security-filter-select">
-                            <option value="all">All Threats</option>
-                            <option value="low">Low Threat</option>
-                            <option value="medium">Medium Threat</option>
-                            <option value="high">High Threat</option>
-                            <option value="critical">Critical Threat</option>
+                <div class="logistics-content">
+                    <div class="logistics-filters">
+                        <input type="text" id="logisticsSearch" placeholder="Search routes..." class="logistics-search-input">
+                        <select id="logisticsFilter" class="logistics-filter-select">
+                            <option value="all">All Routes</option>
+                            <option value="active">Active Only</option>
+                            <option value="completed">Completed</option>
+                            <option value="pending">Pending</option>
+                            <option value="delayed">Delayed</option>
                         </select>
-                        <select id="securitySort" class="security-sort-select">
-                            <option value="threat">Sort by Threat Level</option>
-                            <option value="region">Sort by Region</option>
-                            <option value="updated">Sort by Last Updated</option>
-                            <option value="system">Sort by System</option>
+                        <select id="logisticsSort" class="logistics-sort-select">
+                            <option value="priority">Sort by Priority</option>
+                            <option value="status">Sort by Status</option>
+                            <option value="arrival">Sort by Arrival</option>
+                            <option value="pilot">Sort by Pilot</option>
                         </select>
                     </div>
                     
-                    <div class="security-stats">
+                    <div class="logistics-stats">
                         <div class="stat-card">
-                            <span class="stat-number" id="totalThreats">0</span>
-                            <span class="stat-label">Total Threats</span>
+                            <span class="stat-number" id="totalRoutes">0</span>
+                            <span class="stat-label">Total Routes</span>
                         </div>
                         <div class="stat-card">
-                            <span class="stat-number" id="activeThreats">0</span>
-                            <span class="stat-label">Active Threats</span>
+                            <span class="stat-number" id="activeRoutes">0</span>
+                            <span class="stat-label">Active Routes</span>
                         </div>
                         <div class="stat-card">
-                            <span class="stat-number" id="criticalThreats">0</span>
-                            <span class="stat-label">Critical Threats</span>
+                            <span class="stat-number" id="totalCargo">0</span>
+                            <span class="stat-label">Total Cargo (m³)</span>
                         </div>
                         <div class="stat-card">
-                            <span class="stat-number" id="affectedSystems">0</span>
-                            <span class="stat-label">Affected Systems</span>
+                            <span class="stat-number" id="onTimeDelivery">0%</span>
+                            <span class="stat-label">On-Time Delivery</span>
                         </div>
                     </div>
                     
-                    <div id="securityList" class="security-list">
-                        <!-- Security threats will be populated here -->
+                    <div id="logisticsList" class="logistics-list">
+                        <!-- Logistics routes will be populated here -->
                     </div>
                 </div>
             </section>

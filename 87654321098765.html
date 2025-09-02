@@ -6,6 +6,21 @@
     <title>Deletion Logs - Trimark Industries</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        // Check wallet connection on page load - SECURITY GATE
+        document.addEventListener('DOMContentLoaded', function() {
+            const walletConnected = localStorage.getItem('walletConnected');
+            const walletAccount = localStorage.getItem('walletAccount');
+            
+            if (!walletConnected || !walletAccount) {
+                console.log('❌ No wallet connection found, redirecting to landing page');
+                window.location.href = 'landing.html';
+                return;
+            }
+            
+            console.log('✅ Wallet connection verified:', walletAccount);
+        });
+    </script>
 </head>
 <body>
     <div class="stars"></div>
@@ -24,13 +39,13 @@
             </div>
             
             <nav class="nav">
-                <a href="index.html" class="nav-link">Home</a>
-                <a href="about.html" class="nav-link">About</a>
-                <a href="ore-sites.html" class="nav-link">Ore Sites</a>
-                <a href="roles.html" class="nav-link">Roles</a>
-                <a href="events.html" class="nav-link">Events</a>
-                <a href="members.html" class="nav-link">Members</a>
-                <a href="logs.html" class="nav-link active">Logs</a>
+                <a href="57438920535443.html" class="nav-link">Home</a>
+                <a href="89234756123456.html" class="nav-link">About</a>
+                <a href="34567890123456.html" class="nav-link">Ore Sites</a>
+                <a href="45678912345678.html" class="nav-link">Roles</a>
+                <a href="23456789012345.html" class="nav-link">Events</a>
+                <a href="98765432109876.html" class="nav-link">Members</a>
+                <a href="87654321098765.html" class="nav-link active">Logs</a>
             </nav>
         </header>
 

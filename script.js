@@ -1234,3 +1234,71 @@ console.log('🔀 MULTIPLE ROLES: Users can now hold multiple roles simultaneous
 console.log('🎯 ROLE ASSIGNMENT: Moved to members page - click members to assign roles');
 console.log('👁️ ROLES DISPLAY: Roles page now shows clickable role boxes with holders');
 console.log('🔄 ROLE UPDATES: Member role now displays as "👥 Crew Member", automatically assigned to all players without specific roles');
+
+// ============================================================================
+// SECURITY: Session Timeout Protection
+// ============================================================================
+
+// Start session timeout protection
+function startSessionTimer() {
+    console.log('🔒 Starting session timeout protection (30 minutes)');
+    
+    // Clear any existing timer
+    if (window.sessionTimer) {
+        clearTimeout(window.sessionTimer);
+    }
+    
+    // Set new timer
+    window.sessionTimer = setTimeout(() => {
+        console.log('⏰ Session timeout reached, logging out user');
+        logoutAndRedirect();
+    }, 30 * 60 * 1000); // 30 minutes
+    
+    // Reset timer on user activity
+    document.addEventListener('click', resetSessionTimer);
+    document.addEventListener('keypress', resetSessionTimer);
+    document.addEventListener('scroll', resetSessionTimer);
+    document.addEventListener('mousemove', resetSessionTimer);
+}
+
+// Reset session timer on user activity
+function resetSessionTimer() {
+    if (window.sessionTimer) {
+        clearTimeout(window.sessionTimer);
+        window.sessionTimer = setTimeout(() => {
+            console.log('⏰ Session timeout reached, logging out user');
+            logoutAndRedirect();
+        }, 30 * 60 * 1000); // 30 minutes
+    }
+}
+
+// Logout and redirect to landing page
+function logoutAndRedirect() {
+    console.log('🚪 Security logout: Session timeout or security violation');
+    
+    // Clear all authentication data
+    localStorage.removeItem('walletConnected');
+    localStorage.removeItem('walletAccount');
+    localStorage.removeItem('walletType');
+    localStorage.removeItem('trimark_user_data');
+    
+    // Clear session timer
+    if (window.sessionTimer) {
+        clearTimeout(window.sessionTimer);
+        window.sessionTimer = null;
+    }
+    
+    // Remove event listeners
+    document.removeEventListener('click', resetSessionTimer);
+    document.removeEventListener('keypress', resetSessionTimer);
+    document.removeEventListener('scroll', resetSessionTimer);
+    document.removeEventListener('mousemove', resetSessionTimer);
+    
+    // Redirect to landing page
+    window.location.href = 'landing.html';
+}
+
+console.log('🔒 Session timeout protection initialized');
+console.log('⏰ Session timeout set to 30 minutes');
+console.log('🔄 Timer resets on user activity');
+console.log('🚪 Automatic logout on timeout or security violation');

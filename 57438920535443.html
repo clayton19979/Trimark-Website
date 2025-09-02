@@ -16,6 +16,20 @@
             script.onerror = () => console.error('All ethers CDNs failed');
             document.head.appendChild(script);
         }
+        
+        // Check wallet connection on page load - SECURITY GATE
+        document.addEventListener('DOMContentLoaded', function() {
+            const walletConnected = localStorage.getItem('walletConnected');
+            const walletAccount = localStorage.getItem('walletAccount');
+            
+            if (!walletConnected || !walletAccount) {
+                console.log('❌ No wallet connection found, redirecting to landing page');
+                window.location.href = 'landing.html';
+                return;
+            }
+            
+            console.log('✅ Wallet connection verified:', walletAccount);
+        });
     </script>
     <script src="https://unpkg.com/@metamask/detect-provider@2.0.0/dist/detect-provider.min.js"></script>
 </head>
@@ -36,12 +50,12 @@
             </div>
             
             <nav class="nav">
-                <a href="home.html" class="nav-link active">Home</a>
-                <a href="about.html" class="nav-link">About</a>
-                <a href="ore-sites.html" class="nav-link">Ore Sites</a>
-                <a href="roles.html" class="nav-link">Roles</a>
-                <a href="members.html" class="nav-link">Members</a>
-                <a href="events.html" class="nav-link">Events</a>
+                <a href="57438920535443.html" class="nav-link active">Home</a>
+                <a href="89234756123456.html" class="nav-link">About</a>
+                <a href="34567890123456.html" class="nav-link">Ore Sites</a>
+                <a href="45678912345678.html" class="nav-link">Roles</a>
+                <a href="98765432109876.html" class="nav-link">Members</a>
+                <a href="23456789012345.html" class="nav-link">Events</a>
             </nav>
 
             <div class="wallet-section">
@@ -99,7 +113,7 @@
                     </div>
                     
                     <div class="admin-section">
-                        <h3>🔍 Recent Activity</h3>
+                        <h3>�� Recent Activity</h3>
                         <div id="recentActivity" class="activity-log">
                             <p class="no-activity">No recent activity</p>
                         </div>
@@ -148,8 +162,8 @@
                         across the EVE Frontier universe.
                     </p>
                     <div class="hero-buttons">
-                        <a href="about.html" class="cta-btn primary">Member Resources</a>
-                        <a href="ore-sites.html" class="cta-btn secondary">Ore Sites</a>
+                        <a href="89234756123456.html" class="cta-btn primary">Member Resources</a>
+                        <a href="34567890123456.html" class="cta-btn secondary">Ore Sites</a>
                     </div>
                 </div>
                 
@@ -170,12 +184,12 @@
             <div class="footer-content">
                 <div class="footer-section">
                     <h4>Quick Links</h4>
-                    <a href="home.html">Home</a>
-                    <a href="about.html">About</a>
-                    <a href="ore-sites.html">Ore Sites</a>
-                    <a href="roles.html">Roles</a>
-                    <a href="members.html">Members</a>
-                    <a href="events.html">Events</a>
+                    <a href="57438920535443.html">Home</a>
+                    <a href="89234756123456.html">About</a>
+                    <a href="34567890123456.html">Ore Sites</a>
+                    <a href="45678912345678.html">Roles</a>
+                    <a href="98765432109876.html">Members</a>
+                    <a href="23456789012345.html">Events</a>
                 </div>
 
             </div>
