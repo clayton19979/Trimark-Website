@@ -222,8 +222,8 @@ function getRoleDisplayInfo(role) {
             name: 'Event Coordinator'
         },
         'member': {
-            display: '👤 Member',
-            name: 'Member'
+            display: '👥 Crew Member',
+            name: 'Crew Member'
         }
     };
     
@@ -678,6 +678,18 @@ function displayRoleHolders(role, holdersElement) {
         }
     }
     
+    // Special handling for member role (crew member display)
+    if (role === 'member') {
+        console.log(`🔍 Special handling for member role (crew member)`);
+        // Check if any users don't have specific roles assigned (they get member role by default)
+        for (const member of tribeMembers) {
+            if (!userRoles[member.name] || userRoles[member.name].length === 0) {
+                holders.push(member.name);
+                console.log(`✅ Found user with default crew member role: ${member.name}`);
+            }
+        }
+    }
+    
     console.log(`📊 Total holders found: ${holders.length}`, holders);
     
     if (holders.length === 0) {
@@ -750,9 +762,15 @@ function displayMemberRoles() {
                 // Handle old single-role format
                 const roleInfo = getRoleDisplayInfo(memberRoles);
                 rolesElement.innerHTML = `<span class="member-role-badge">${roleInfo.display}</span>`;
-            } else {
-                rolesElement.innerHTML = '<span class="member-role-badge no-role">👤 Member</span>';
+                    } else {
+            // Automatically assign member role (which now uses crew member icon)
+            if (!userRoles[member.name]) {
+                userRoles[member.name] = ['member'];
+                localStorage.setItem('trimark_user_roles', JSON.stringify(userRoles));
+                console.log(`✅ Automatically assigned crew member role to ${member.name}`);
             }
+            rolesElement.innerHTML = '<span class="member-role-badge no-role">👥 Crew Member</span>';
+        }
         }
     });
 }
@@ -778,7 +796,6 @@ function showRoleAssignmentModal(memberName) {
                             <option value="field_survey_lead">🔍 Field Survey Lead</option>
                             <option value="recruiter">📢 Recruiter</option>
                             <option value="ambassador">🌐 Ambassador</option>
-                            <option value="crew_member">👥 Crew Member</option>
                             <option value="event_coordinator">📅 Event Coordinator</option>
                         </select>
                     </div>
@@ -835,6 +852,12 @@ function assignRoleToMember(memberName) {
         return;
     }
     
+    // Prevent assigning crew member role
+    if (roleSelect.value === 'crew_member') {
+        alert('Crew member role cannot be assigned. Members automatically have this role.');
+        return;
+    }
+    
     // Add the new role
     userRoles[memberName].push(roleSelect.value);
     
@@ -887,7 +910,7 @@ function migrateRoleFormat() {
             
             for (const [userName, roles] of Object.entries(oldRoles)) {
                 if (Array.isArray(roles)) {
-                    newRoles[userName] = roles;
+                    newRoles[userName] = [roles];
                 } else {
                     // Convert single role to array
                     newRoles[userName] = [roles];
@@ -897,6 +920,22 @@ function migrateRoleFormat() {
             userRoles = newRoles;
             localStorage.setItem('trimark_user_roles', JSON.stringify(newRoles));
             console.log('✅ Role format migration completed');
+        }
+        
+        // Migrate crew_member roles to member roles
+        let needsCrewMigration = false;
+        for (const [userName, roles] of Object.entries(userRoles)) {
+            if (Array.isArray(roles) && roles.includes('crew_member')) {
+                needsCrewMigration = true;
+                // Replace crew_member with member
+                const newRoles = roles.map(role => role === 'crew_member' ? 'member' : role);
+                userRoles[userName] = newRoles;
+            }
+        }
+        
+        if (needsCrewMigration) {
+            localStorage.setItem('trimark_user_roles', JSON.stringify(userRoles));
+            console.log('✅ Crew member to member role migration completed');
         }
     }
 }
@@ -964,6 +1003,12 @@ function assignRole() {
         return;
     }
     
+    // Prevent assigning crew member role
+    if (roleSelect.value === 'crew_member') {
+        alert('Crew member role cannot be assigned. Members automatically have this role.');
+        return;
+    }
+    
     // Add the new role
     userRoles[userName].push(roleSelect.value);
     
@@ -1003,6 +1048,12 @@ function requestRole() {
     
     if (!roleSelect.value || !roleReason) {
         alert('Please fill in all fields.');
+        return;
+    }
+    
+    // Prevent requesting crew member role
+    if (roleSelect.value === 'crew_member') {
+        alert('Crew member role cannot be requested. Members automatically have this role.');
         return;
     }
     
@@ -1124,7 +1175,8 @@ function getRoleDisplayName(role) {
         'recruiter': '📢 Recruiter',
         'ambassador': '🌐 Ambassador',
         'crew_member': '👥 Crew Member',
-        'event_coordinator': '📅 Event Coordinator'
+        'event_coordinator': '📅 Event Coordinator',
+        'member': '👥 Crew Member'
     };
     return roleNames[role] || role;
 }
@@ -1138,9 +1190,10 @@ function getRoleIcon(role) {
         'recruiter': '📢',
         'ambassador': '🌐',
         'crew_member': '👥',
-        'event_coordinator': '📅'
+        'event_coordinator': '📅',
+        'member': '👥'
     };
-    return roleIcons[role] || '👤';
+    return roleIcons[role] || '👥';
 }
 
 function checkAdminStatus() {
@@ -1180,3 +1233,4 @@ console.log('📝 No hardcoded administrators - all roles assigned through syste
 console.log('🔀 MULTIPLE ROLES: Users can now hold multiple roles simultaneously');
 console.log('🎯 ROLE ASSIGNMENT: Moved to members page - click members to assign roles');
 console.log('👁️ ROLES DISPLAY: Roles page now shows clickable role boxes with holders');
+console.log('🔄 ROLE UPDATES: Member role now displays as "👥 Crew Member", automatically assigned to all players without specific roles');
